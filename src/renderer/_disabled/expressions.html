@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<!-- 원어민 표현 화면: 자연스러운 표현과 설명 동시 학습 -->
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>모국어 - 원어민 표현</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="shell app-shell">
+    <aside class="sidebar">
+      <div class="brand-mark">
+        <h1 class="brand-title">모국어</h1>
+        <p class="brand-subtitle">레벨 4 학습자</p>
+      </div>
+      <nav class="sidebar-nav">
+        <a class="nav-link" href="dashboard.html"><span class="material-symbols-outlined">dashboard</span><span>대시보드</span></a>
+        <a class="nav-link" href="sentence.html"><span class="material-symbols-outlined">menu_book</span><span>문장 학습</span></a>
+        <a class="nav-link" href="vocabulary.html"><span class="material-symbols-outlined">translate</span><span>단어 학습</span></a>
+        <a class="nav-link active" href="expressions.html"><span class="material-symbols-outlined">record_voice_over</span><span>원어민 표현</span></a>
+        <a class="nav-link" href="mypage.html"><span class="material-symbols-outlined">insights</span><span>마이페이지</span></a>
+      </nav>
+      <div class="sidebar-cta">
+        <button class="btn btn-primary" data-demo-action type="button">표현 저장</button>
+      </div>
+      <div class="sidebar-footer">
+        <a href="settings.html"><span class="material-symbols-outlined">settings</span><span>설정</span></a>
+        <a href="main.html"><span class="material-symbols-outlined">logout</span><span>로그아웃</span></a>
+      </div>
+    </aside>
+    <div class="main-area">
+    <!-- 커스텀 타이틀바 -->
+    <div class="app-titlebar">
+      <div class="app-titlebar-drag"></div>
+      <div class="topbar-window-btns">
+        <button class="titlebar-btn" id="btn-minimize" type="button">&#x2013;</button>
+        <button class="titlebar-btn" id="btn-maximize" type="button">&#x25A1;</button>
+        <button class="titlebar-btn titlebar-btn-close" id="btn-close" type="button">&#x2715;</button>
+      </div>
+    </div>
+      <header class="topbar">
+        <a class="topbar-brand" href="dashboard.html">모국어</a>
+        <div class="topbar-actions">
+          <button class="icon-button" id="btn-menu-open" type="button"><span class="material-symbols-outlined">menu</span></button>
+        </div>
+      </header>
+      <div class="page-body-wrap"><main class="page-body">
+        <section class="surface">
+          <!-- 오늘의 표현 소개와 좌우 상세 패널 -->
+          <div class="hero-grid">
+            <div>
+              <div class="section-label">Native Expressions</div>
+              <h1 class="hero-title" style="font-size: clamp(38px, 4vw, 58px);">어색한 문장을<br>자연스러운 말로 바꿉니다.</h1>
+              <p class="hero-copy">시안의 여백감과 고급스러운 민트 톤을 유지하면서, 표현 리스트와 상세 해설을 양쪽 패널 구조로 정리했습니다.</p>
+            </div>
+            <div class="status-card">
+              <div class="section-label">오늘의 표현</div>
+              <h2 class="section-title spacer-top">What do you do?</h2>
+              <p class="hero-copy">처음 만난 사람에게 직업을 물을 때 가장 자연스럽게 쓰이는 표현입니다.</p>
+            </div>
+          </div>
+
+          <section class="board-grid spacer-lg">
+            <!-- 표현 리스트와 현재 선택 표현 상세 -->
+            <article class="card">
+              <div class="section-label">표현 리스트</div>
+              <div class="list-stack spacer-top" id="expressions-grid">
+                <div class="list-item"><div><strong>What do you do?</strong><p class="small muted">직업을 물을 때 자주 쓰는 표현</p></div><span class="chip">상세 보기</span></div>
+                <div class="list-item"><div><strong>I am on my way.</strong><p class="small muted">이동 중일 때 자연스럽게 쓰는 표현</p></div><span class="chip">상세 보기</span></div>
+                <div class="list-item"><div><strong>That works for me.</strong><p class="small muted">일정이나 제안에 동의할 때 쓰는 말</p></div><span class="chip">상세 보기</span></div>
+              </div>
+            </article>
+            <article class="card">
+              <div class="section-label">표현 상세</div>
+              <div class="list-stack spacer-top">
+                <div class="list-item" style="align-items: flex-start;">
+                  <div>
+                    <strong>어색한 표현</strong>
+                    <p class="small muted">Where is your job?</p>
+                  </div>
+                </div>
+                <div class="list-item" style="align-items: flex-start;">
+                  <div>
+                    <strong>자연스러운 표현</strong>
+                    <p class="small muted">What do you do?</p>
+                  </div>
+                </div>
+                <div class="list-item" style="align-items: flex-start;">
+                  <div>
+                    <strong>상황 설명</strong>
+                    <p class="small muted">직업의 위치를 묻는 것이 아니라, 상대의 직업이나 하는 일을 묻는 맥락입니다.</p>
+                  </div>
+                </div>
+                <div class="list-item" style="align-items: flex-start;">
+                  <div>
+                    <strong>학습 포인트</strong>
+                    <p class="small muted">표현 자체를 통째로 익히고, 실제 질문 상황과 연결해서 기억하는 것이 좋습니다.</p>
+                  </div>
+                </div>
+              </div>
+            </article>
+          </section>
+        </section>
+        <footer class="page-footer">
+          <div>© 2026 모국어</div>
+          <nav>
+            <a href="#">고객 센터</a>
+            <a href="settings.html">설정</a>
+            <a href="#">개인정보 처리방침</a>
+            <a href="#">이용 약관</a>
+          </nav>
+        </footer>
+      </main></div>
+    </div>
+  </div>
+  <!-- 슬라이드 메뉴 오버레이 -->
+  <div class="menu-overlay" id="menu-overlay"></div>
+  <aside class="slide-menu" id="slide-menu">
+    <div class="slide-menu-header">
+      <span class="brand-title" style="font-size:20px;">모국어</span>
+      <button class="icon-button" id="btn-menu-close" type="button"><span class="material-symbols-outlined">close</span></button>
+    </div>
+    <nav class="slide-menu-nav">
+      <a href="dashboard.html"><span class="material-symbols-outlined">dashboard</span><span>대시보드</span></a>
+      <a href="sentence.html"><span class="material-symbols-outlined">menu_book</span><span>문장 학습</span></a>
+      <a href="vocabulary.html"><span class="material-symbols-outlined">translate</span><span>단어 학습</span></a>
+      <a href="expressions.html"><span class="material-symbols-outlined">record_voice_over</span><span>원어민 표현</span></a>
+      <a href="mypage.html"><span class="material-symbols-outlined">insights</span><span>마이페이지</span></a>
+      <a href="settings.html"><span class="material-symbols-outlined">settings</span><span>설정</span></a>
+    </nav>
+    <div class="slide-menu-footer">
+      <a class="btn btn-ghost" id="btn-logout" href="#">로그아웃</a>
+    </div>
+  </aside>
+  <script src="data-loader.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,852 @@
+[
+  {
+    "id": "s001",
+    "level": "beginner",
+    "category": "daily",
+    "english": "I left my phone on the kitchen table this morning.",
+    "answer": "오늘 아침에 휴대전화를 부엌 식탁 위에 두고 왔어요.",
+    "keywords": [
+      "오늘 아침",
+      "휴대전화",
+      "부엌",
+      "식탁",
+      "두고 오다"
+    ],
+    "tip": "leave는 장소에 무언가를 두고 오거나 놓아둔 상황을 말할 때 가장 자연스럽습니다.",
+    "grammar": "on the table처럼 표면 위에 있을 때는 전치사 on을 씁니다.",
+    "extra": "this morning은 보통 과거시제와 함께 쓰여 이미 끝난 시간대를 가리킵니다."
+  },
+  {
+    "id": "s002",
+    "level": "beginner",
+    "category": "daily",
+    "english": "She usually drinks tea before she starts work.",
+    "answer": "그녀는 보통 일을 시작하기 전에 차를 마셔요.",
+    "keywords": [
+      "보통",
+      "차",
+      "일 시작",
+      "전에",
+      "습관"
+    ],
+    "tip": "usually는 현재의 반복 습관을 말할 때 현재시제와 자주 함께 옵니다.",
+    "grammar": "before 뒤에는 시간 관계를 보여 주는 절이 올 수 있습니다.",
+    "extra": "starts work는 begins working보다 더 일상적인 표현입니다."
+  },
+  {
+    "id": "s003",
+    "level": "beginner",
+    "category": "travel",
+    "english": "We need to catch the last train home tonight.",
+    "answer": "우리는 오늘 밤 집에 가는 막차를 타야 해요.",
+    "keywords": [
+      "오늘 밤",
+      "집",
+      "막차",
+      "타다",
+      "필요"
+    ],
+    "tip": "catch는 기차나 버스를 시간에 맞춰 타는 상황에서 많이 씁니다.",
+    "grammar": "need to 다음에는 동사원형이 와서 필요를 나타냅니다.",
+    "extra": "the last train은 특정한 마지막 열차를 가리켜 관사 the를 씁니다."
+  },
+  {
+    "id": "s004",
+    "level": "beginner",
+    "category": "emotion",
+    "english": "He looks tired because he slept only three hours.",
+    "answer": "그는 세 시간밖에 못 자서 피곤해 보여요.",
+    "keywords": [
+      "피곤해 보이다",
+      "세 시간",
+      "밖에",
+      "자다",
+      "이유"
+    ],
+    "tip": "look tired는 상태가 겉으로 보일 때 쓰는 기본 표현입니다.",
+    "grammar": "because는 이유를 설명하는 절을 이끌어 줍니다.",
+    "extra": "slept only three hours는 수면 시간이 부족했다는 의미를 분명하게 줍니다."
+  },
+  {
+    "id": "s005",
+    "level": "beginner",
+    "category": "business",
+    "english": "Please send me the updated file by noon.",
+    "answer": "업데이트된 파일을 정오까지 보내 주세요.",
+    "keywords": [
+      "보내다",
+      "업데이트된 파일",
+      "정오까지",
+      "부탁",
+      "업무"
+    ],
+    "tip": "updated file은 수정이 끝난 최신 파일이라는 뜻으로 업무에서 자주 보입니다.",
+    "grammar": "by noon은 늦어도 정오까지라는 마감 시점을 뜻합니다.",
+    "extra": "Please로 시작하면 직접적이지만 공손한 요청이 됩니다."
+  },
+  {
+    "id": "s006",
+    "level": "beginner",
+    "category": "travel",
+    "english": "Is this seat taken, or can I sit here?",
+    "answer": "이 자리 누가 앉아 있나요, 아니면 제가 앉아도 되나요?",
+    "keywords": [
+      "자리",
+      "앉아 있다",
+      "앉다",
+      "질문",
+      "허락"
+    ],
+    "tip": "Is this seat taken?은 대중교통이나 카페에서 매우 자연스러운 질문입니다.",
+    "grammar": "or는 두 가능성을 나란히 놓고 묻는 역할을 합니다.",
+    "extra": "can I sit here는 허락을 정중하게 묻는 쉬운 패턴입니다."
+  },
+  {
+    "id": "s007",
+    "level": "beginner",
+    "category": "daily",
+    "english": "My brother cooks dinner when our parents work late.",
+    "answer": "부모님이 늦게까지 일하시면 우리 형이 저녁을 해요.",
+    "keywords": [
+      "형",
+      "저녁",
+      "요리하다",
+      "늦게까지 일하다",
+      "가족"
+    ],
+    "tip": "cook dinner는 저녁을 준비한다는 뜻으로 가장 기본적인 조합입니다.",
+    "grammar": "when은 특정 상황이나 반복되는 때를 연결하는 접속사입니다.",
+    "extra": "work late는 늦은 시간까지 근무한다는 뜻의 고정 표현입니다."
+  },
+  {
+    "id": "s008",
+    "level": "beginner",
+    "category": "academic",
+    "english": "This chart shows how sales changed over time.",
+    "answer": "이 차트는 매출이 시간에 따라 어떻게 변했는지 보여 줍니다.",
+    "keywords": [
+      "차트",
+      "매출",
+      "시간에 따라",
+      "변하다",
+      "보여 주다"
+    ],
+    "tip": "show how는 발표나 보고서에서 변화를 설명할 때 유용합니다.",
+    "grammar": "over time은 시간이 지나면서라는 의미의 부사구입니다.",
+    "extra": "sales changed는 수치가 변한 사실을 간단하게 전달합니다."
+  },
+  {
+    "id": "s009",
+    "level": "beginner",
+    "category": "emotion",
+    "english": "I felt relieved after I heard the test results.",
+    "answer": "시험 결과를 듣고 나서 안도했어요.",
+    "keywords": [
+      "안도하다",
+      "시험 결과",
+      "듣다",
+      "후에",
+      "감정"
+    ],
+    "tip": "relieved는 걱정이 풀렸을 때 느끼는 안도감을 잘 보여 줍니다.",
+    "grammar": "after 뒤에는 먼저 일어난 일을 설명하는 절이 올 수 있습니다.",
+    "extra": "heard the test results는 결과를 전달받은 상황을 자연스럽게 말합니다."
+  },
+  {
+    "id": "s010",
+    "level": "beginner",
+    "category": "business",
+    "english": "Our manager asked for a short summary after the meeting.",
+    "answer": "우리 매니저는 회의 후에 짧은 요약을 요청했어요.",
+    "keywords": [
+      "매니저",
+      "회의 후",
+      "짧은 요약",
+      "요청하다",
+      "업무"
+    ],
+    "tip": "ask for는 물건이나 자료를 요청할 때 편하게 쓸 수 있습니다.",
+    "grammar": "after the meeting처럼 전치사 뒤에는 명사구가 옵니다.",
+    "extra": "short summary는 장황하지 않은 핵심 정리를 뜻합니다."
+  },
+  {
+    "id": "s011",
+    "level": "intermediate",
+    "category": "business",
+    "english": "The client requested a clearer timeline for the next release.",
+    "answer": "고객은 다음 릴리스를 위한 더 명확한 일정을 요청했습니다.",
+    "keywords": [
+      "고객",
+      "더 명확한 일정",
+      "다음 릴리스",
+      "요청",
+      "업무"
+    ],
+    "tip": "timeline은 단순한 날짜보다 단계별 일정 흐름을 강조할 때 좋습니다.",
+    "grammar": "for the next release는 timeline을 구체화하는 전치사구입니다.",
+    "extra": "requested는 asked보다 공식적인 업무 톤을 줍니다."
+  },
+  {
+    "id": "s012",
+    "level": "intermediate",
+    "category": "daily",
+    "english": "I keep forgetting his name, even though we met twice.",
+    "answer": "두 번이나 만났는데도 계속 그의 이름이 기억나지 않아요.",
+    "keywords": [
+      "계속",
+      "잊다",
+      "이름",
+      "두 번",
+      "양보"
+    ],
+    "tip": "keep forgetting은 반복적으로 잊는 답답함을 잘 전달합니다.",
+    "grammar": "even though는 예상과 다른 상황을 연결하는 양보 접속사입니다.",
+    "extra": "met twice는 서로 이미 두 차례 만난 적이 있음을 간단히 말합니다."
+  },
+  {
+    "id": "s013",
+    "level": "intermediate",
+    "category": "travel",
+    "english": "If the weather improves, we might hike to the lake tomorrow.",
+    "answer": "날씨가 좋아지면 내일 호수까지 하이킹할지도 몰라요.",
+    "keywords": [
+      "날씨가 좋아지다",
+      "내일",
+      "호수",
+      "하이킹",
+      "가능성"
+    ],
+    "tip": "might는 확신이 높지 않은 가능성을 부드럽게 나타냅니다.",
+    "grammar": "조건절에서는 미래 상황이어도 현재시제 improves를 씁니다.",
+    "extra": "hike to the lake는 목적지를 포함해 자연스럽게 말한 형태입니다."
+  },
+  {
+    "id": "s014",
+    "level": "intermediate",
+    "category": "academic",
+    "english": "Several students struggled to explain the main argument concisely.",
+    "answer": "몇몇 학생들은 핵심 주장을 간결하게 설명하는 데 어려움을 겪었습니다.",
+    "keywords": [
+      "몇몇 학생",
+      "핵심 주장",
+      "간결하게",
+      "설명",
+      "어려움"
+    ],
+    "tip": "concisely는 장황함 없이 핵심만 전달한다는 평가어로 자주 쓰입니다.",
+    "grammar": "struggle to 다음에는 동사원형이 와서 어려움을 겪는 행동을 나타냅니다.",
+    "extra": "main argument는 글이나 발표의 중심 논지를 뜻합니다."
+  },
+  {
+    "id": "s015",
+    "level": "intermediate",
+    "category": "emotion",
+    "english": "She sounded disappointed, but she tried not to show it.",
+    "answer": "그녀는 실망한 듯 들렸지만 그것을 드러내지 않으려 했어요.",
+    "keywords": [
+      "실망한 듯",
+      "들리다",
+      "드러내지 않다",
+      "하지만",
+      "감정"
+    ],
+    "tip": "sound disappointed는 목소리에서 감정을 추론할 때 자연스럽습니다.",
+    "grammar": "try not to는 어떤 행동을 하지 않으려 애쓴다는 뜻입니다.",
+    "extra": "show it에서 it은 바로 앞의 감정을 가리킵니다."
+  },
+  {
+    "id": "s016",
+    "level": "intermediate",
+    "category": "business",
+    "english": "We should confirm the budget before contacting outside vendors.",
+    "answer": "외부 업체에 연락하기 전에 예산을 확인해야 합니다.",
+    "keywords": [
+      "예산",
+      "확인하다",
+      "외부 업체",
+      "연락하기 전에",
+      "업무"
+    ],
+    "tip": "vendor는 공급업체나 외주업체를 포괄적으로 가리킬 때 좋습니다.",
+    "grammar": "before contacting처럼 전치사 뒤에 동명사가 올 수 있습니다.",
+    "extra": "should는 강한 명령보다 부드러운 제안을 만듭니다."
+  },
+  {
+    "id": "s017",
+    "level": "intermediate",
+    "category": "daily",
+    "english": "By the time I arrived, everyone had already started eating.",
+    "answer": "제가 도착했을 때는 모두 이미 식사를 시작한 뒤였어요.",
+    "keywords": [
+      "도착했을 때",
+      "이미",
+      "모두",
+      "식사를 시작하다",
+      "시점"
+    ],
+    "tip": "By the time은 어떤 시점까지 상황이 진행되었음을 강조합니다.",
+    "grammar": "과거의 두 사건 중 더 먼저 일어난 일에 과거완료 had started를 씁니다.",
+    "extra": "already는 기대보다 이른 진행을 암시합니다."
+  },
+  {
+    "id": "s018",
+    "level": "intermediate",
+    "category": "travel",
+    "english": "The museum was smaller than expected, yet the exhibits were impressive.",
+    "answer": "박물관은 생각보다 작았지만 전시물은 인상적이었습니다.",
+    "keywords": [
+      "생각보다 작다",
+      "하지만",
+      "전시물",
+      "인상적",
+      "박물관"
+    ],
+    "tip": "yet은 but보다 약간 더 문어적이면서 대조를 선명하게 만듭니다.",
+    "grammar": "smaller than expected는 비교급과 생략 구조가 함께 쓰인 표현입니다.",
+    "extra": "exhibits는 박물관이나 전시회에서 전시된 대상들을 말합니다."
+  },
+  {
+    "id": "s019",
+    "level": "intermediate",
+    "category": "academic",
+    "english": "Her essay became stronger once she added concrete examples.",
+    "answer": "그녀의 에세이는 구체적인 예시를 추가하자 더 탄탄해졌습니다.",
+    "keywords": [
+      "에세이",
+      "더 탄탄해지다",
+      "구체적인 예시",
+      "추가하다",
+      "학술"
+    ],
+    "tip": "concrete examples는 추상적 주장에 설득력을 더할 때 핵심 표현입니다.",
+    "grammar": "once는 어떤 일이 일어난 뒤의 변화를 연결할 때 쓸 수 있습니다.",
+    "extra": "became stronger는 글의 논리와 설득력이 향상되었음을 넓게 표현합니다."
+  },
+  {
+    "id": "s020",
+    "level": "intermediate",
+    "category": "emotion",
+    "english": "I was embarrassed that I had misunderstood such a simple question.",
+    "answer": "그렇게 쉬운 질문을 오해했다는 사실이 부끄러웠어요.",
+    "keywords": [
+      "부끄럽다",
+      "오해하다",
+      "쉬운 질문",
+      "사실",
+      "감정"
+    ],
+    "tip": "embarrassed는 창피함과 민망함이 섞인 감정을 표현할 때 적절합니다.",
+    "grammar": "that절은 embarrassed의 이유를 구체적으로 설명합니다.",
+    "extra": "such a simple question은 화자의 자책감을 조금 더 강하게 만듭니다."
+  },
+  {
+    "id": "s021",
+    "level": "intermediate",
+    "category": "business",
+    "english": "Please note that the invoice does not include shipping fees.",
+    "answer": "청구서에는 배송비가 포함되어 있지 않다는 점을 확인해 주세요.",
+    "keywords": [
+      "청구서",
+      "포함되지 않다",
+      "배송비",
+      "유의하다",
+      "업무"
+    ],
+    "tip": "Please note that은 이메일에서 주의를 환기할 때 흔한 표현입니다.",
+    "grammar": "does not include처럼 현재시제는 문서의 현재 상태를 설명할 때 자연스럽습니다.",
+    "extra": "shipping fees는 배송과 관련된 비용 전반을 가리킵니다."
+  },
+  {
+    "id": "s022",
+    "level": "intermediate",
+    "category": "daily",
+    "english": "He rarely complains, so his reaction surprised everyone.",
+    "answer": "그는 좀처럼 불평하지 않아서 그의 반응이 모두를 놀라게 했어요.",
+    "keywords": [
+      "좀처럼",
+      "불평하다",
+      "반응",
+      "놀라게 하다",
+      "일상"
+    ],
+    "tip": "rarely는 빈도가 매우 낮다는 점을 간결하게 보여 줍니다.",
+    "grammar": "so는 앞의 이유가 뒤 결과로 이어짐을 나타냅니다.",
+    "extra": "reaction surprised everyone은 예상 밖의 감정 표현을 강조합니다."
+  },
+  {
+    "id": "s023",
+    "level": "intermediate",
+    "category": "travel",
+    "english": "We got lost because the map on my phone would not load.",
+    "answer": "휴대전화 지도가 열리지 않아서 길을 잃었어요.",
+    "keywords": [
+      "길을 잃다",
+      "휴대전화 지도",
+      "열리지 않다",
+      "이유",
+      "여행"
+    ],
+    "tip": "would not load는 기기가 제대로 작동하지 않았다는 불만을 자연스럽게 전합니다.",
+    "grammar": "get lost는 길을 잃는 상태 변화를 나타내는 구동사입니다.",
+    "extra": "the map on my phone은 소유보다 위치 관계를 먼저 보여 줍니다."
+  },
+  {
+    "id": "s024",
+    "level": "intermediate",
+    "category": "academic",
+    "english": "The article raises an interesting question about language and identity.",
+    "answer": "그 글은 언어와 정체성에 관한 흥미로운 질문을 제기합니다.",
+    "keywords": [
+      "글",
+      "흥미로운 질문",
+      "언어",
+      "정체성",
+      "제기하다"
+    ],
+    "tip": "raise a question은 문제의식을 드러낼 때 매우 자주 쓰입니다.",
+    "grammar": "about은 question 뒤에서 다루는 주제를 연결합니다.",
+    "extra": "language and identity는 인문사회 분야에서 자주 보이는 조합입니다."
+  },
+  {
+    "id": "s025",
+    "level": "intermediate",
+    "category": "emotion",
+    "english": "After weeks of waiting, they finally felt hopeful again.",
+    "answer": "몇 주를 기다린 끝에 그들은 마침내 다시 희망을 느꼈습니다.",
+    "keywords": [
+      "몇 주 동안",
+      "기다리다",
+      "마침내",
+      "다시 희망",
+      "감정"
+    ],
+    "tip": "hopeful은 막연한 낙관보다 회복된 기대감을 담기에 좋습니다.",
+    "grammar": "After weeks of waiting에서 of 뒤에는 동명사 waiting이 옵니다.",
+    "extra": "finally는 오랜 지연 뒤에 도달한 변화를 강조합니다."
+  },
+  {
+    "id": "s026",
+    "level": "advanced",
+    "category": "business",
+    "english": "Although the proposal was ambitious, it remained financially realistic.",
+    "answer": "그 제안은 야심찼지만 재정적으로는 여전히 현실성이 있었습니다.",
+    "keywords": [
+      "제안",
+      "야심차다",
+      "재정적으로",
+      "현실성",
+      "대조"
+    ],
+    "tip": "ambitious는 규모가 크고 목표가 높다는 긍정적 뉘앙스를 가질 수 있습니다.",
+    "grammar": "Although는 양보를 나타내며 뒤 절과 주절의 대비를 만듭니다.",
+    "extra": "financially realistic는 이상적이기만 한 계획이 아니라는 점을 강조합니다."
+  },
+  {
+    "id": "s027",
+    "level": "advanced",
+    "category": "academic",
+    "english": "The findings challenge assumptions that had long gone unquestioned.",
+    "answer": "그 연구 결과는 오랫동안 의심받지 않았던 가정들에 이의를 제기합니다.",
+    "keywords": [
+      "연구 결과",
+      "가정들",
+      "오랫동안",
+      "의심받지 않다",
+      "이의 제기"
+    ],
+    "tip": "challenge assumptions는 학술 글쓰기에서 비판적 기여를 드러내는 표현입니다.",
+    "grammar": "that had long gone unquestioned는 assumptions를 꾸미는 관계절입니다.",
+    "extra": "gone unquestioned는 거의 관용적으로 쓰이며 비판 없이 받아들여졌다는 뜻입니다."
+  },
+  {
+    "id": "s028",
+    "level": "advanced",
+    "category": "emotion",
+    "english": "He was uneasy, not because of danger, but because of uncertainty.",
+    "answer": "그는 위험 때문이 아니라 불확실성 때문에 불안했습니다.",
+    "keywords": [
+      "불안하다",
+      "위험",
+      "불확실성",
+      "때문이 아니라",
+      "감정"
+    ],
+    "tip": "uneasy는 공포보다 약하지만 편치 않은 상태를 정교하게 보여 줍니다.",
+    "grammar": "not because of A, but because of B는 원인을 대비시키는 구조입니다.",
+    "extra": "uncertainty는 결과를 알 수 없을 때의 심리적 부담을 강조합니다."
+  },
+  {
+    "id": "s029",
+    "level": "advanced",
+    "category": "travel",
+    "english": "Had we checked the schedule earlier, we could have avoided the delay.",
+    "answer": "우리가 일정을 더 일찍 확인했더라면 그 지연을 피할 수 있었을 겁니다.",
+    "keywords": [
+      "더 일찍",
+      "일정 확인",
+      "지연",
+      "피하다",
+      "가정"
+    ],
+    "tip": "could have avoided는 과거의 가능했지만 실현되지 않은 결과를 말합니다.",
+    "grammar": "Had we checked는 if를 생략한 가정법 과거완료 도치입니다.",
+    "extra": "the delay는 맥락상 이미 알고 있는 특정 지연을 가리킵니다."
+  },
+  {
+    "id": "s030",
+    "level": "advanced",
+    "category": "business",
+    "english": "The report outlines several risks that warrant immediate attention.",
+    "answer": "그 보고서는 즉각적인 주의가 필요한 여러 위험 요소를 개괄합니다.",
+    "keywords": [
+      "보고서",
+      "여러 위험 요소",
+      "즉각적인 주의",
+      "필요하다",
+      "개괄하다"
+    ],
+    "tip": "warrant는 공식 문서에서 충분한 근거나 필요성을 나타낼 때 강력합니다.",
+    "grammar": "that warrant immediate attention은 risks를 꾸미는 관계절입니다.",
+    "extra": "outlines는 세부 분석보다 핵심을 구조적으로 제시한다는 느낌을 줍니다."
+  },
+  {
+    "id": "s031",
+    "level": "advanced",
+    "category": "daily",
+    "english": "No matter how busy she is, she replies with remarkable patience.",
+    "answer": "그녀는 아무리 바빠도 눈에 띄는 인내심으로 답장을 합니다.",
+    "keywords": [
+      "아무리 바빠도",
+      "답장하다",
+      "눈에 띄는",
+      "인내심",
+      "일상"
+    ],
+    "tip": "remarkable은 단순히 좋다보다 한층 더 눈에 띈다는 평가를 줍니다.",
+    "grammar": "No matter how는 조건이 달라져도 결과가 같음을 나타냅니다.",
+    "extra": "replies with patience는 태도까지 함께 전달하는 자연스러운 조합입니다."
+  },
+  {
+    "id": "s032",
+    "level": "advanced",
+    "category": "academic",
+    "english": "To interpret the data fairly, we must separate correlation from causation.",
+    "answer": "데이터를 공정하게 해석하려면 상관관계와 인과관계를 구분해야 합니다.",
+    "keywords": [
+      "데이터",
+      "공정하게 해석하다",
+      "상관관계",
+      "인과관계",
+      "구분하다"
+    ],
+    "tip": "correlation and causation은 연구 방법론에서 매우 자주 대비됩니다.",
+    "grammar": "To interpret the data fairly는 목적을 나타내는 부정사구입니다.",
+    "extra": "must는 원칙적 필요성을 강하게 드러냅니다."
+  },
+  {
+    "id": "s033",
+    "level": "advanced",
+    "category": "emotion",
+    "english": "Her apology felt sincere enough to restore some of their trust.",
+    "answer": "그녀의 사과는 그들의 신뢰를 어느 정도 회복시킬 만큼 진심으로 느껴졌습니다.",
+    "keywords": [
+      "사과",
+      "진심",
+      "신뢰 회복",
+      "어느 정도",
+      "감정"
+    ],
+    "tip": "sincere enough to는 진정성이 실제 효과로 이어졌음을 보여 줍니다.",
+    "grammar": "enough to 다음에는 결과나 가능성을 나타내는 동사원형이 옵니다.",
+    "extra": "restore trust는 관계 회복 맥락에서 자주 쓰는 표현입니다."
+  },
+  {
+    "id": "s034",
+    "level": "advanced",
+    "category": "travel",
+    "english": "The village was so quiet that even the river sounded distant.",
+    "answer": "그 마을은 너무 조용해서 강물 소리마저 멀게 들렸습니다.",
+    "keywords": [
+      "마을",
+      "너무 조용하다",
+      "강물 소리",
+      "멀게 들리다",
+      "여행"
+    ],
+    "tip": "distant는 실제 거리뿐 아니라 감각적으로 멀게 느껴지는 인상도 줍니다.",
+    "grammar": "so ... that 구조는 정도와 그 결과를 연결합니다.",
+    "extra": "even은 예상 밖 요소인 강물 소리까지 포함해 강조합니다."
+  },
+  {
+    "id": "s035",
+    "level": "advanced",
+    "category": "business",
+    "english": "Unless we simplify the process, new staff will keep making the same mistake.",
+    "answer": "우리가 절차를 단순화하지 않으면 신규 직원들은 같은 실수를 계속할 겁니다.",
+    "keywords": [
+      "절차 단순화",
+      "신규 직원",
+      "같은 실수",
+      "계속하다",
+      "조건"
+    ],
+    "tip": "simplify the process는 업무 개선 문맥에서 직접적이고 실용적입니다.",
+    "grammar": "Unless는 if not의 의미를 가진 조건 접속사입니다.",
+    "extra": "keep making은 반복되는 문제의 지속성을 강조합니다."
+  },
+  {
+    "id": "s036",
+    "level": "advanced",
+    "category": "academic",
+    "english": "What appears obvious in hindsight was difficult to predict beforehand.",
+    "answer": "지나고 보니 분명해 보이는 것이 미리 예측하기는 어려웠습니다.",
+    "keywords": [
+      "지나고 보니",
+      "분명해 보이다",
+      "미리",
+      "예측하기 어렵다",
+      "학술"
+    ],
+    "tip": "in hindsight는 결과를 안 뒤의 시각을 설명할 때 매우 유용합니다.",
+    "grammar": "What appears obvious는 문장 전체의 주어 역할을 하는 명사절입니다.",
+    "extra": "beforehand는 사전에라는 뜻으로 predict를 자연스럽게 보완합니다."
+  },
+  {
+    "id": "s037",
+    "level": "advanced",
+    "category": "emotion",
+    "english": "They were frustrated less by the loss than by the lack of explanation.",
+    "answer": "그들은 손실 자체보다 설명의 부재 때문에 더 좌절했습니다.",
+    "keywords": [
+      "좌절하다",
+      "손실",
+      "설명의 부재",
+      "비교",
+      "감정"
+    ],
+    "tip": "lack of explanation은 결과보다 과정의 불투명함이 문제일 때 적절합니다.",
+    "grammar": "less by A than by B는 원인을 비교하는 구조입니다.",
+    "extra": "the loss는 이미 공유된 특정 손실을 가리킵니다."
+  },
+  {
+    "id": "s038",
+    "level": "advanced",
+    "category": "daily",
+    "english": "Whenever he gives advice, he speaks as if certainty were kindness.",
+    "answer": "그는 조언할 때마다 마치 확신이 친절인 것처럼 말합니다.",
+    "keywords": [
+      "조언하다",
+      "말하다",
+      "마치",
+      "확신",
+      "친절"
+    ],
+    "tip": "as if는 사실과 다른 인상이나 태도를 비유적으로 보여 주기에 좋습니다.",
+    "grammar": "as if 절에서는 비현실성을 나타내기 위해 were를 쓸 수 있습니다.",
+    "extra": "certainty were kindness는 화자의 비판적 시선을 담습니다."
+  },
+  {
+    "id": "s039",
+    "level": "advanced",
+    "category": "travel",
+    "english": "The guide recommended leaving early so that we could avoid the crowds.",
+    "answer": "가이드는 인파를 피할 수 있도록 일찍 출발하라고 권했습니다.",
+    "keywords": [
+      "가이드",
+      "일찍 출발하다",
+      "인파",
+      "피하다",
+      "권하다"
+    ],
+    "tip": "recommend leaving은 여행 안내나 실용 조언에서 자주 들립니다.",
+    "grammar": "so that은 목적을 나타내며 뒤에 조동사가 자주 옵니다.",
+    "extra": "avoid the crowds는 관광지 맥락에서 매우 자연스러운 표현입니다."
+  },
+  {
+    "id": "s040",
+    "level": "beginner",
+    "category": "business",
+    "english": "Could you check whether the payment went through today?",
+    "answer": "오늘 결제가 정상적으로 처리됐는지 확인해 주시겠어요?",
+    "keywords": [
+      "결제",
+      "정상적으로 처리되다",
+      "오늘",
+      "확인",
+      "업무"
+    ],
+    "tip": "go through는 결제나 신청이 문제없이 처리되었다는 뜻으로 자주 쓰입니다.",
+    "grammar": "whether는 yes 또는 no로 답할 수 있는 간접의문문을 이끕니다.",
+    "extra": "Could you는 이메일과 대화 모두에서 공손한 요청 표현입니다."
+  },
+  {
+    "id": "s041",
+    "level": "beginner",
+    "category": "daily",
+    "english": "There is still some coffee left in the pot.",
+    "answer": "주전자에 아직 커피가 조금 남아 있어요.",
+    "keywords": [
+      "아직",
+      "커피",
+      "조금 남아 있다",
+      "주전자",
+      "일상"
+    ],
+    "tip": "left는 남아 있는 상태를 짧고 자연스럽게 표현합니다.",
+    "grammar": "There is 구문은 어떤 것이 존재함을 소개할 때 씁니다.",
+    "extra": "some coffee는 정확한 양보다 일정량이 남았다는 점에 초점을 둡니다."
+  },
+  {
+    "id": "s042",
+    "level": "beginner",
+    "category": "travel",
+    "english": "Turn left at the corner, and you will see the station.",
+    "answer": "모퉁이에서 왼쪽으로 도시면 역이 보일 거예요.",
+    "keywords": [
+      "모퉁이",
+      "왼쪽으로 돌다",
+      "역",
+      "보이다",
+      "길 안내"
+    ],
+    "tip": "Turn left는 길 안내에서 가장 기본적인 명령형 표현입니다.",
+    "grammar": "명령문, and 주어 will 동사 구조는 결과를 자연스럽게 이어 줍니다.",
+    "extra": "at the corner는 방향을 바꾸는 지점을 알려 줍니다."
+  },
+  {
+    "id": "s043",
+    "level": "beginner",
+    "category": "academic",
+    "english": "The professor asked us to read chapter five before class.",
+    "answer": "교수님은 수업 전에 5장을 읽어 오라고 하셨어요.",
+    "keywords": [
+      "교수님",
+      "읽어 오다",
+      "5장",
+      "수업 전에",
+      "학업"
+    ],
+    "tip": "ask someone to do는 과제나 요청을 전달할 때 매우 자주 쓰입니다.",
+    "grammar": "before class처럼 class 앞에 관사가 없는 경우가 많습니다.",
+    "extra": "chapter five는 책의 특정 장을 간단히 지칭합니다."
+  },
+  {
+    "id": "s044",
+    "level": "beginner",
+    "category": "emotion",
+    "english": "I was nervous at first, but the interview became easier.",
+    "answer": "처음에는 긴장했지만 면접은 점점 더 수월해졌어요.",
+    "keywords": [
+      "처음에는",
+      "긴장하다",
+      "면접",
+      "더 수월해지다",
+      "감정"
+    ],
+    "tip": "at first는 초반 상태를 소개할 때 간단하고 효과적입니다.",
+    "grammar": "became easier는 상태 변화와 비교급을 함께 보여 줍니다.",
+    "extra": "but은 앞뒤 감정 흐름의 전환을 자연스럽게 만듭니다."
+  },
+  {
+    "id": "s045",
+    "level": "intermediate",
+    "category": "business",
+    "english": "Even a small delay can affect the entire delivery schedule.",
+    "answer": "작은 지연 하나도 전체 배송 일정에 영향을 줄 수 있습니다.",
+    "keywords": [
+      "작은 지연",
+      "전체",
+      "배송 일정",
+      "영향을 주다",
+      "업무"
+    ],
+    "tip": "affect는 influence보다 일상적이면서도 충분히 공식적인 동사입니다.",
+    "grammar": "can은 가능성과 잠재적 영향을 나타냅니다.",
+    "extra": "entire delivery schedule은 일부가 아닌 전체 계획을 강조합니다."
+  },
+  {
+    "id": "s046",
+    "level": "intermediate",
+    "category": "daily",
+    "english": "She keeps her promises, which is why people trust her.",
+    "answer": "그녀는 약속을 지키기 때문에 사람들이 그녀를 신뢰합니다.",
+    "keywords": [
+      "약속을 지키다",
+      "사람들",
+      "신뢰하다",
+      "이유",
+      "일상"
+    ],
+    "tip": "keep a promise는 매우 기본적이지만 강한 인상을 주는 표현입니다.",
+    "grammar": "which is why는 앞 문장의 내용을 이유로 정리해 줍니다.",
+    "extra": "trust her는 인물의 평판과 성품을 간단히 보여 줍니다."
+  },
+  {
+    "id": "s047",
+    "level": "intermediate",
+    "category": "travel",
+    "english": "The hotel was convenient, although the room felt a bit cramped.",
+    "answer": "호텔은 편리했지만 방은 조금 비좁게 느껴졌어요.",
+    "keywords": [
+      "호텔",
+      "편리하다",
+      "방",
+      "조금 비좁다",
+      "여행"
+    ],
+    "tip": "cramped는 단순히 small보다 답답한 좁음을 더 잘 전달합니다.",
+    "grammar": "although는 하나의 문장에서 장점과 단점을 함께 묶어 줍니다.",
+    "extra": "felt a bit cramped는 직접적이되 지나치게 불만스럽지 않은 표현입니다."
+  },
+  {
+    "id": "s048",
+    "level": "intermediate",
+    "category": "academic",
+    "english": "Most readers can follow the article, provided that the terms are defined.",
+    "answer": "용어가 정의되어 있다면 대부분의 독자는 그 글을 따라갈 수 있습니다.",
+    "keywords": [
+      "대부분의 독자",
+      "글을 따라가다",
+      "용어",
+      "정의되다",
+      "조건"
+    ],
+    "tip": "provided that은 if보다 조금 더 공식적인 조건 표현입니다.",
+    "grammar": "are defined는 수동태로 용어가 설명된 상태를 나타냅니다.",
+    "extra": "follow the article은 내용을 이해하며 읽어 간다는 뜻입니다."
+  },
+  {
+    "id": "s049",
+    "level": "intermediate",
+    "category": "emotion",
+    "english": "He smiled politely, though his eyes still looked worried.",
+    "answer": "그는 공손하게 미소 지었지만 눈빛은 여전히 걱정스러워 보였어요.",
+    "keywords": [
+      "공손하게",
+      "미소 짓다",
+      "눈빛",
+      "여전히",
+      "걱정스러워 보이다"
+    ],
+    "tip": "politely는 행동의 태도를 붙여 관계의 거리감을 암시할 수도 있습니다.",
+    "grammar": "though는 문장 끝이나 중간에서 양보를 부드럽게 나타냅니다.",
+    "extra": "look worried는 얼굴이나 눈빛에 드러난 불안을 말할 때 자연스럽습니다."
+  },
+  {
+    "id": "s050",
+    "level": "advanced",
+    "category": "travel",
+    "english": "The city reveals its character best when you walk without a fixed plan.",
+    "answer": "그 도시는 정해진 계획 없이 걸을 때 가장 잘 그 성격을 드러냅니다.",
+    "keywords": [
+      "도시",
+      "성격을 드러내다",
+      "정해진 계획 없이",
+      "걸을 때",
+      "여행"
+    ],
+    "tip": "reveal its character는 장소의 분위기와 개성을 감각적으로 설명합니다.",
+    "grammar": "best는 동사 reveals를 수식해 가장 잘이라는 의미를 줍니다.",
+    "extra": "without a fixed plan은 즉흥적인 여행 방식을 자연스럽게 나타냅니다."
+  }
+]

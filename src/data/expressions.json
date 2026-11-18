@@ -1,0 +1,302 @@
+[
+  {
+    "id": "e001",
+    "level": "beginner",
+    "category": "daily",
+    "expression": "break the ice",
+    "korean": "어색한 분위기를 깨다",
+    "example": "He told a joke to break the ice.",
+    "context": "처음 만난 사람과의 대화에서 자주 사용",
+    "note": "직역하면 얼음을 깨는 것이지만 실제로는 분위기를 부드럽게 만든다는 뜻"
+  },
+  {
+    "id": "e002",
+    "level": "beginner",
+    "category": "daily",
+    "expression": "on the same page",
+    "korean": "생각이 같다, 이해가 일치하다",
+    "example": "Let us make sure we are on the same page.",
+    "context": "회의나 협업 상황에서 많이 사용",
+    "note": "같은 정보를 공유하고 있다는 의미로 자주 쓰임"
+  },
+  {
+    "id": "e003",
+    "level": "beginner",
+    "category": "idiom",
+    "expression": "under the weather",
+    "korean": "몸이 좋지 않은",
+    "example": "I am feeling a bit under the weather today.",
+    "context": "가벼운 몸살이나 컨디션 난조를 말할 때 사용",
+    "note": "날씨와 직접 관련된 표현은 아니다"
+  },
+  {
+    "id": "e004",
+    "level": "beginner",
+    "category": "daily",
+    "expression": "in a hurry",
+    "korean": "바쁘게, 급하게",
+    "example": "She left the house in a hurry.",
+    "context": "시간이 부족한 상황에서 흔히 사용",
+    "note": "hurry 자체가 서두름을 뜻함"
+  },
+  {
+    "id": "e005",
+    "level": "beginner",
+    "category": "business",
+    "expression": "follow up",
+    "korean": "후속 조치하다",
+    "example": "I will follow up by email tomorrow.",
+    "context": "업무 이메일과 고객 응대에서 매우 흔함",
+    "note": "명사와 동사로 모두 쓸 수 있음"
+  },
+  {
+    "id": "e006",
+    "level": "beginner",
+    "category": "idiom",
+    "expression": "call it a day",
+    "korean": "오늘은 이만하다",
+    "example": "Let us call it a day and continue tomorrow.",
+    "context": "일을 마무리할 때 사용",
+    "note": "반드시 하루 종일 일했을 필요는 없음"
+  },
+  {
+    "id": "e007",
+    "level": "beginner",
+    "category": "daily",
+    "expression": "at the moment",
+    "korean": "지금은, 현재는",
+    "example": "I cannot talk at the moment.",
+    "context": "현재 상황을 설명할 때 자주 사용",
+    "note": "now보다 약간 부드럽게 들릴 수 있음"
+  },
+  {
+    "id": "e008",
+    "level": "beginner",
+    "category": "slang",
+    "expression": "no big deal",
+    "korean": "별거 아니야",
+    "example": "Missing one train is no big deal.",
+    "context": "가벼운 위로 또는 축소 표현으로 사용",
+    "note": "상대의 긴장을 풀어 주는 데 유용함"
+  },
+  {
+    "id": "e009",
+    "level": "beginner",
+    "category": "business",
+    "expression": "touch base",
+    "korean": "간단히 연락하다",
+    "example": "I wanted to touch base before the presentation.",
+    "context": "북미식 업무 회화에서 흔함",
+    "note": "공식 문서보다는 말이나 이메일에서 자연스러움"
+  },
+  {
+    "id": "e010",
+    "level": "beginner",
+    "category": "daily",
+    "expression": "come in handy",
+    "korean": "유용하게 쓰이다",
+    "example": "This flashlight may come in handy later.",
+    "context": "도구나 정보의 유용성을 말할 때 사용",
+    "note": "미래에 도움이 될 가능성을 내포함"
+  },
+  {
+    "id": "e011",
+    "level": "intermediate",
+    "category": "idiom",
+    "expression": "get the hang of",
+    "korean": "요령을 익히다",
+    "example": "You will get the hang of it soon.",
+    "context": "새 기술이나 작업에 익숙해질 때 사용",
+    "note": "hang은 여기서 문자 그대로의 뜻이 아님"
+  },
+  {
+    "id": "e012",
+    "level": "intermediate",
+    "category": "business",
+    "expression": "run by",
+    "korean": "검토를 부탁하다",
+    "example": "Can I run this idea by you first?",
+    "context": "동료나 상사에게 의견을 구할 때 사용",
+    "note": "공유와 검토의 뉘앙스가 함께 있음"
+  },
+  {
+    "id": "e013",
+    "level": "intermediate",
+    "category": "daily",
+    "expression": "figure out",
+    "korean": "이해하다, 해결하다",
+    "example": "We need time to figure out the problem.",
+    "context": "일상과 업무 모두에서 매우 빈번함",
+    "note": "out이 붙어 해결의 느낌을 강화함"
+  },
+  {
+    "id": "e014",
+    "level": "intermediate",
+    "category": "idiom",
+    "expression": "spill the beans",
+    "korean": "비밀을 털어놓다",
+    "example": "Who spilled the beans about the surprise?",
+    "context": "가벼운 비밀이나 계획이 드러났을 때 사용",
+    "note": "너무 심각한 기밀 상황에는 덜 어울림"
+  },
+  {
+    "id": "e015",
+    "level": "intermediate",
+    "category": "business",
+    "expression": "keep in mind",
+    "korean": "명심하다",
+    "example": "Keep in mind that the deadline may change.",
+    "context": "안내나 주의 사항을 전달할 때 사용",
+    "note": "that절과 함께 자주 연결됨"
+  },
+  {
+    "id": "e016",
+    "level": "intermediate",
+    "category": "daily",
+    "expression": "out of nowhere",
+    "korean": "갑자기, 느닷없이",
+    "example": "The question came out of nowhere.",
+    "context": "예상치 못한 상황을 설명할 때 사용",
+    "note": "장소 의미보다 돌발성을 강조함"
+  },
+  {
+    "id": "e017",
+    "level": "intermediate",
+    "category": "idiom",
+    "expression": "hit the nail on the head",
+    "korean": "정확히 핵심을 짚다",
+    "example": "Your comment hit the nail on the head.",
+    "context": "분석이나 평가가 정확할 때 사용",
+    "note": "직역보다 비유 의미가 중요함"
+  },
+  {
+    "id": "e018",
+    "level": "intermediate",
+    "category": "business",
+    "expression": "circle back",
+    "korean": "다시 논의하다",
+    "example": "I will circle back once I have more data.",
+    "context": "회의 후 추가 논의를 예고할 때 사용",
+    "note": "미국식 업무 표현으로 특히 흔함"
+  },
+  {
+    "id": "e019",
+    "level": "intermediate",
+    "category": "daily",
+    "expression": "go out of your way",
+    "korean": "굳이 애써 하다",
+    "example": "She went out of her way to help me.",
+    "context": "호의나 배려를 강조할 때 사용",
+    "note": "보통 긍정적 맥락에서 많이 들림"
+  },
+  {
+    "id": "e020",
+    "level": "intermediate",
+    "category": "slang",
+    "expression": "my bad",
+    "korean": "내 실수야",
+    "example": "I forgot the file, my bad.",
+    "context": "가벼운 사과로 자주 사용",
+    "note": "격식 있는 자리에는 덜 적절함"
+  },
+  {
+    "id": "e021",
+    "level": "advanced",
+    "category": "business",
+    "expression": "move the needle",
+    "korean": "눈에 띄는 변화를 만들다",
+    "example": "We need a strategy that actually moves the needle.",
+    "context": "성과 개선 논의에서 자주 사용",
+    "note": "작은 변화가 아닌 의미 있는 진전을 뜻함"
+  },
+  {
+    "id": "e022",
+    "level": "advanced",
+    "category": "idiom",
+    "expression": "read the room",
+    "korean": "분위기를 파악하다",
+    "example": "He should have read the room before joking.",
+    "context": "사회적 분위기나 반응을 살필 때 사용",
+    "note": "대인관계 감각을 평가할 때 자주 나옴"
+  },
+  {
+    "id": "e023",
+    "level": "advanced",
+    "category": "business",
+    "expression": "set expectations",
+    "korean": "기대 수준을 미리 정하다",
+    "example": "The manager set expectations clearly at the start.",
+    "context": "프로젝트 착수와 커뮤니케이션에서 중요",
+    "note": "책임과 범위를 선명하게 만드는 표현"
+  },
+  {
+    "id": "e024",
+    "level": "advanced",
+    "category": "daily",
+    "expression": "take it personally",
+    "korean": "개인적으로 받아들이다",
+    "example": "Try not to take the criticism personally.",
+    "context": "비판이나 거절 반응을 말할 때 사용",
+    "note": "personally가 감정적 해석을 강조함"
+  },
+  {
+    "id": "e025",
+    "level": "advanced",
+    "category": "idiom",
+    "expression": "a blessing in disguise",
+    "korean": "전화위복",
+    "example": "Losing that job was a blessing in disguise.",
+    "context": "나중에 좋은 결과로 이어진 일을 말할 때 사용",
+    "note": "초기에는 나빠 보여도 결과가 좋았다는 뜻"
+  },
+  {
+    "id": "e026",
+    "level": "advanced",
+    "category": "business",
+    "expression": "raise the bar",
+    "korean": "기준을 높이다",
+    "example": "The new policy raises the bar for quality.",
+    "context": "성과나 품질 기준을 높일 때 사용",
+    "note": "bar는 기준선을 비유적으로 나타냄"
+  },
+  {
+    "id": "e027",
+    "level": "advanced",
+    "category": "daily",
+    "expression": "wear yourself out",
+    "korean": "너무 무리하다",
+    "example": "Do not wear yourself out before the trip.",
+    "context": "과로하거나 에너지를 과하게 쓸 때 사용",
+    "note": "재귀대명사가 함께 쓰이는 점이 특징"
+  },
+  {
+    "id": "e028",
+    "level": "advanced",
+    "category": "slang",
+    "expression": "low-key",
+    "korean": "은근히, 살짝",
+    "example": "I am low-key excited about the news.",
+    "context": "감정을 과장하지 않고 표현할 때 사용",
+    "note": "문맥에 따라 형용사나 부사처럼 들림"
+  },
+  {
+    "id": "e029",
+    "level": "advanced",
+    "category": "business",
+    "expression": "think outside the box",
+    "korean": "틀에 박히지 않게 생각하다",
+    "example": "We need to think outside the box here.",
+    "context": "창의적 해결책을 요구할 때 사용",
+    "note": "매우 흔하지만 진부하게 느껴질 수도 있음"
+  },
+  {
+    "id": "e030",
+    "level": "advanced",
+    "category": "idiom",
+    "expression": "the elephant in the room",
+    "korean": "모두가 알지만 피하는 문제",
+    "example": "No one mentioned the elephant in the room.",
+    "context": "민감한 문제를 회피하는 상황에서 사용",
+    "note": "직접적인 비난 없이 핵심 문제를 지적함"
+  }
+]

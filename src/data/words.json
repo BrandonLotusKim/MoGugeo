@@ -1,0 +1,902 @@
+[
+  {
+    "id": "w001",
+    "level": "beginner",
+    "word": "grateful",
+    "pronunciation": "/ˈɡreɪt.fəl/",
+    "meaning": "감사한, 고마워하는",
+    "example": "I am grateful for your help.",
+    "related": "grateful to, grateful for"
+  },
+  {
+    "id": "w002",
+    "level": "beginner",
+    "word": "hesitate",
+    "pronunciation": "/ˈhez.ɪ.teɪt/",
+    "meaning": "망설이다",
+    "example": "Do not hesitate to ask questions.",
+    "related": "hesitate to, without hesitation"
+  },
+  {
+    "id": "w003",
+    "level": "beginner",
+    "word": "practical",
+    "pronunciation": "/ˈpræk.tɪ.kəl/",
+    "meaning": "실용적인",
+    "example": "We need a practical solution.",
+    "related": "practical advice, practical skills"
+  },
+  {
+    "id": "w004",
+    "level": "beginner",
+    "word": "maintain",
+    "pronunciation": "/meɪnˈteɪn/",
+    "meaning": "유지하다",
+    "example": "It is hard to maintain focus all day.",
+    "related": "maintain quality, maintain contact"
+  },
+  {
+    "id": "w005",
+    "level": "beginner",
+    "word": "observe",
+    "pronunciation": "/əbˈzɝːv/",
+    "meaning": "관찰하다, 준수하다",
+    "example": "Researchers observed the pattern carefully.",
+    "related": "observe closely, observe a rule"
+  },
+  {
+    "id": "w006",
+    "level": "beginner",
+    "word": "reliable",
+    "pronunciation": "/rɪˈlaɪ.ə.bəl/",
+    "meaning": "믿을 수 있는",
+    "example": "She is a reliable colleague.",
+    "related": "reliable source, reliable service"
+  },
+  {
+    "id": "w007",
+    "level": "beginner",
+    "word": "brief",
+    "pronunciation": "/briːf/",
+    "meaning": "짧은, 간단한",
+    "example": "Please give me a brief update.",
+    "related": "brief summary, in brief"
+  },
+  {
+    "id": "w008",
+    "level": "beginner",
+    "word": "convince",
+    "pronunciation": "/kənˈvɪns/",
+    "meaning": "납득시키다",
+    "example": "The data convinced the team.",
+    "related": "convince someone, convince yourself"
+  },
+  {
+    "id": "w009",
+    "level": "beginner",
+    "word": "ordinary",
+    "pronunciation": "/ˈɔːr.dən.er.i/",
+    "meaning": "평범한, 보통의",
+    "example": "It seemed like an ordinary day.",
+    "related": "ordinary people, ordinary routine"
+  },
+  {
+    "id": "w010",
+    "level": "beginner",
+    "word": "anxious",
+    "pronunciation": "/ˈæŋk.ʃəs/",
+    "meaning": "불안한, 걱정하는",
+    "example": "He felt anxious before the exam.",
+    "related": "anxious about, anxious to"
+  },
+  {
+    "id": "w011",
+    "level": "beginner",
+    "word": "arrange",
+    "pronunciation": "/əˈreɪndʒ/",
+    "meaning": "정리하다, 준비하다",
+    "example": "We arranged the chairs in a circle.",
+    "related": "arrange a meeting, arrange for"
+  },
+  {
+    "id": "w012",
+    "level": "beginner",
+    "word": "cautious",
+    "pronunciation": "/ˈkɑː.ʃəs/",
+    "meaning": "조심스러운",
+    "example": "Investors remain cautious this year.",
+    "related": "cautious approach, cautious about"
+  },
+  {
+    "id": "w013",
+    "level": "beginner",
+    "word": "delay",
+    "pronunciation": "/dɪˈleɪ/",
+    "meaning": "지연시키다, 지연",
+    "example": "Bad weather delayed the flight.",
+    "related": "without delay, cause a delay"
+  },
+  {
+    "id": "w014",
+    "level": "beginner",
+    "word": "efficient",
+    "pronunciation": "/ɪˈfɪʃ.ənt/",
+    "meaning": "효율적인",
+    "example": "This tool is simple and efficient.",
+    "related": "efficient system, energy-efficient"
+  },
+  {
+    "id": "w015",
+    "level": "beginner",
+    "word": "flexible",
+    "pronunciation": "/ˈflek.sə.bəl/",
+    "meaning": "유연한",
+    "example": "Our schedule is fairly flexible.",
+    "related": "flexible hours, flexible mindset"
+  },
+  {
+    "id": "w016",
+    "level": "beginner",
+    "word": "genuine",
+    "pronunciation": "/ˈdʒen.ju.ɪn/",
+    "meaning": "진심 어린, 진짜의",
+    "example": "Her concern sounded genuine.",
+    "related": "genuine interest, genuine leather"
+  },
+  {
+    "id": "w017",
+    "level": "beginner",
+    "word": "highlight",
+    "pronunciation": "/ˈhaɪ.laɪt/",
+    "meaning": "강조하다, 하이라이트",
+    "example": "The report highlights key trends.",
+    "related": "highlight a point, key highlight"
+  },
+  {
+    "id": "w018",
+    "level": "beginner",
+    "word": "ignore",
+    "pronunciation": "/ɪɡˈnɔːr/",
+    "meaning": "무시하다",
+    "example": "You should not ignore the warning.",
+    "related": "ignore advice, cannot ignore"
+  },
+  {
+    "id": "w019",
+    "level": "beginner",
+    "word": "justify",
+    "pronunciation": "/ˈdʒʌs.tə.faɪ/",
+    "meaning": "정당화하다",
+    "example": "The results justify the cost.",
+    "related": "justify a decision, self-justify"
+  },
+  {
+    "id": "w020",
+    "level": "beginner",
+    "word": "keen",
+    "pronunciation": "/kiːn/",
+    "meaning": "열정적인, 예리한",
+    "example": "She is keen to learn faster.",
+    "related": "keen on, keen interest"
+  },
+  {
+    "id": "w021",
+    "level": "beginner",
+    "word": "limit",
+    "pronunciation": "/ˈlɪm.ɪt/",
+    "meaning": "제한하다, 한계",
+    "example": "We must limit unnecessary spending.",
+    "related": "set a limit, time limit"
+  },
+  {
+    "id": "w022",
+    "level": "beginner",
+    "word": "modify",
+    "pronunciation": "/ˈmɑː.də.faɪ/",
+    "meaning": "수정하다",
+    "example": "The designer modified the layout.",
+    "related": "modify a plan, slightly modified"
+  },
+  {
+    "id": "w023",
+    "level": "beginner",
+    "word": "noticeable",
+    "pronunciation": "/ˈnoʊ.t̬ə.sə.bəl/",
+    "meaning": "눈에 띄는",
+    "example": "There was a noticeable improvement.",
+    "related": "noticeable difference, highly noticeable"
+  },
+  {
+    "id": "w024",
+    "level": "beginner",
+    "word": "outcome",
+    "pronunciation": "/ˈaʊt.kʌm/",
+    "meaning": "결과",
+    "example": "The outcome depends on timing.",
+    "related": "positive outcome, likely outcome"
+  },
+  {
+    "id": "w025",
+    "level": "beginner",
+    "word": "persuade",
+    "pronunciation": "/pɚˈsweɪd/",
+    "meaning": "설득하다",
+    "example": "We persuaded him to stay longer.",
+    "related": "persuade someone to, hard to persuade"
+  },
+  {
+    "id": "w026",
+    "level": "beginner",
+    "word": "quote",
+    "pronunciation": "/kwoʊt/",
+    "meaning": "인용하다, 견적",
+    "example": "They quoted a lower price online.",
+    "related": "quote a passage, price quote"
+  },
+  {
+    "id": "w027",
+    "level": "beginner",
+    "word": "recover",
+    "pronunciation": "/rɪˈkʌv.ɚ/",
+    "meaning": "회복하다",
+    "example": "It took weeks to recover fully.",
+    "related": "recover from, economic recovery"
+  },
+  {
+    "id": "w028",
+    "level": "beginner",
+    "word": "suitable",
+    "pronunciation": "/ˈsuː.t̬ə.bəl/",
+    "meaning": "적절한, 알맞은",
+    "example": "This seat is suitable for children.",
+    "related": "suitable for, highly suitable"
+  },
+  {
+    "id": "w029",
+    "level": "beginner",
+    "word": "transfer",
+    "pronunciation": "/trænsˈfɝː/",
+    "meaning": "옮기다, 환승하다",
+    "example": "You can transfer at the next station.",
+    "related": "transfer data, bank transfer"
+  },
+  {
+    "id": "w030",
+    "level": "beginner",
+    "word": "urgent",
+    "pronunciation": "/ˈɝː.dʒənt/",
+    "meaning": "긴급한",
+    "example": "Please handle this urgent request.",
+    "related": "urgent matter, feel urgent"
+  },
+  {
+    "id": "w031",
+    "level": "beginner",
+    "word": "visible",
+    "pronunciation": "/ˈvɪz.ə.bəl/",
+    "meaning": "보이는, 눈에 띄는",
+    "example": "The damage was clearly visible.",
+    "related": "visible change, visible signs"
+  },
+  {
+    "id": "w032",
+    "level": "beginner",
+    "word": "withdraw",
+    "pronunciation": "/wɪðˈdrɔː/",
+    "meaning": "철회하다, 인출하다",
+    "example": "She decided to withdraw her application.",
+    "related": "withdraw money, withdraw from"
+  },
+  {
+    "id": "w033",
+    "level": "beginner",
+    "word": "accurate",
+    "pronunciation": "/ˈæk.jɚ.ət/",
+    "meaning": "정확한",
+    "example": "We need accurate numbers today.",
+    "related": "accurate information, highly accurate"
+  },
+  {
+    "id": "w034",
+    "level": "beginner",
+    "word": "balance",
+    "pronunciation": "/ˈbæl.əns/",
+    "meaning": "균형, 균형을 맞추다",
+    "example": "It is hard to balance work and rest.",
+    "related": "keep a balance, balance sheet"
+  },
+  {
+    "id": "w035",
+    "level": "intermediate",
+    "word": "capture",
+    "pronunciation": "/ˈkæp.tʃɚ/",
+    "meaning": "포착하다",
+    "example": "The photo captured the mood well.",
+    "related": "capture attention, capture data"
+  },
+  {
+    "id": "w036",
+    "level": "intermediate",
+    "word": "decline",
+    "pronunciation": "/dɪˈklaɪn/",
+    "meaning": "감소하다, 정중히 거절하다",
+    "example": "Sales declined during the winter.",
+    "related": "sharp decline, decline an offer"
+  },
+  {
+    "id": "w037",
+    "level": "intermediate",
+    "word": "essential",
+    "pronunciation": "/ɪˈsen.ʃəl/",
+    "meaning": "필수적인",
+    "example": "Clear communication is essential.",
+    "related": "essential part, absolutely essential"
+  },
+  {
+    "id": "w038",
+    "level": "intermediate",
+    "word": "frequent",
+    "pronunciation": "/ˈfriː.kwənt/",
+    "meaning": "빈번한",
+    "example": "Frequent breaks improve concentration.",
+    "related": "frequent visitor, frequent errors"
+  },
+  {
+    "id": "w039",
+    "level": "intermediate",
+    "word": "generate",
+    "pronunciation": "/ˈdʒen.ə.reɪt/",
+    "meaning": "생성하다, 발생시키다",
+    "example": "The campaign generated strong interest.",
+    "related": "generate revenue, generate ideas"
+  },
+  {
+    "id": "w040",
+    "level": "intermediate",
+    "word": "harmful",
+    "pronunciation": "/ˈhɑːrm.fəl/",
+    "meaning": "해로운",
+    "example": "Too much stress can be harmful.",
+    "related": "harmful effect, harmful to"
+  },
+  {
+    "id": "w041",
+    "level": "intermediate",
+    "word": "insight",
+    "pronunciation": "/ˈɪn.saɪt/",
+    "meaning": "통찰",
+    "example": "The interview gave us useful insight.",
+    "related": "gain insight, valuable insight"
+  },
+  {
+    "id": "w042",
+    "level": "intermediate",
+    "word": "joint",
+    "pronunciation": "/dʒɔɪnt/",
+    "meaning": "공동의",
+    "example": "They announced a joint project.",
+    "related": "joint effort, joint statement"
+  },
+  {
+    "id": "w043",
+    "level": "intermediate",
+    "word": "launch",
+    "pronunciation": "/lɔːntʃ/",
+    "meaning": "출시하다, 시작하다",
+    "example": "The company will launch a new app.",
+    "related": "launch a product, launch event"
+  },
+  {
+    "id": "w044",
+    "level": "intermediate",
+    "word": "measure",
+    "pronunciation": "/ˈmeʒ.ɚ/",
+    "meaning": "측정하다, 조치",
+    "example": "We need a better way to measure progress.",
+    "related": "take measures, measure accurately"
+  },
+  {
+    "id": "w045",
+    "level": "intermediate",
+    "word": "neutral",
+    "pronunciation": "/ˈnuː.trəl/",
+    "meaning": "중립적인",
+    "example": "Try to keep a neutral tone.",
+    "related": "neutral position, politically neutral"
+  },
+  {
+    "id": "w046",
+    "level": "intermediate",
+    "word": "option",
+    "pronunciation": "/ˈɑːp.ʃən/",
+    "meaning": "선택지",
+    "example": "This plan gives us another option.",
+    "related": "best option, option to buy"
+  },
+  {
+    "id": "w047",
+    "level": "intermediate",
+    "word": "precise",
+    "pronunciation": "/prɪˈsaɪs/",
+    "meaning": "정확한, 정밀한",
+    "example": "Be precise when you describe the issue.",
+    "related": "precise language, precise timing"
+  },
+  {
+    "id": "w048",
+    "level": "intermediate",
+    "word": "react",
+    "pronunciation": "/riˈækt/",
+    "meaning": "반응하다",
+    "example": "People react differently to pressure.",
+    "related": "react to, overreact"
+  },
+  {
+    "id": "w049",
+    "level": "intermediate",
+    "word": "stable",
+    "pronunciation": "/ˈsteɪ.bəl/",
+    "meaning": "안정적인",
+    "example": "Prices remained stable this month.",
+    "related": "stable condition, stable job"
+  },
+  {
+    "id": "w050",
+    "level": "intermediate",
+    "word": "typical",
+    "pronunciation": "/ˈtɪp.ɪ.kəl/",
+    "meaning": "전형적인",
+    "example": "That is a typical beginner mistake.",
+    "related": "typical example, typical of"
+  },
+  {
+    "id": "w051",
+    "level": "intermediate",
+    "word": "update",
+    "pronunciation": "/ʌpˈdeɪt/",
+    "meaning": "업데이트하다, 최신 정보",
+    "example": "I will update the file tonight.",
+    "related": "status update, update regularly"
+  },
+  {
+    "id": "w052",
+    "level": "intermediate",
+    "word": "value",
+    "pronunciation": "/ˈvæl.juː/",
+    "meaning": "가치, 소중히 여기다",
+    "example": "Customers value honest feedback.",
+    "related": "market value, value deeply"
+  },
+  {
+    "id": "w053",
+    "level": "intermediate",
+    "word": "wander",
+    "pronunciation": "/ˈwɑːn.dɚ/",
+    "meaning": "거닐다, 헤매다",
+    "example": "We wandered around the old town.",
+    "related": "wander around, mind wanders"
+  },
+  {
+    "id": "w054",
+    "level": "intermediate",
+    "word": "adapt",
+    "pronunciation": "/əˈdæpt/",
+    "meaning": "적응하다, 조정하다",
+    "example": "Small teams adapt quickly to change.",
+    "related": "adapt to, adapt a story"
+  },
+  {
+    "id": "w055",
+    "level": "intermediate",
+    "word": "barrier",
+    "pronunciation": "/ˈber.i.ɚ/",
+    "meaning": "장벽",
+    "example": "Language can become a barrier.",
+    "related": "break a barrier, trade barrier"
+  },
+  {
+    "id": "w056",
+    "level": "intermediate",
+    "word": "combine",
+    "pronunciation": "/kəmˈbaɪn/",
+    "meaning": "결합하다",
+    "example": "The recipe combines sweet and spicy flavors.",
+    "related": "combine A with B, combined effort"
+  },
+  {
+    "id": "w057",
+    "level": "intermediate",
+    "word": "demand",
+    "pronunciation": "/dɪˈmænd/",
+    "meaning": "요구하다, 수요",
+    "example": "Customers demand faster service now.",
+    "related": "in demand, demand that"
+  },
+  {
+    "id": "w058",
+    "level": "intermediate",
+    "word": "emerge",
+    "pronunciation": "/ɪˈmɝːdʒ/",
+    "meaning": "나타나다",
+    "example": "A new pattern began to emerge.",
+    "related": "emerge from, emerging trend"
+  },
+  {
+    "id": "w059",
+    "level": "intermediate",
+    "word": "faint",
+    "pronunciation": "/feɪnt/",
+    "meaning": "희미한, 기절하다",
+    "example": "We heard a faint sound outside.",
+    "related": "faint smell, faintly visible"
+  },
+  {
+    "id": "w060",
+    "level": "intermediate",
+    "word": "guarantee",
+    "pronunciation": "/ˌɡer.ənˈtiː/",
+    "meaning": "보장하다, 보장",
+    "example": "Nothing can guarantee success.",
+    "related": "money-back guarantee, guarantee that"
+  },
+  {
+    "id": "w061",
+    "level": "intermediate",
+    "word": "host",
+    "pronunciation": "/hoʊst/",
+    "meaning": "주최하다, 주인",
+    "example": "The school hosted a public lecture.",
+    "related": "host an event, TV host"
+  },
+  {
+    "id": "w062",
+    "level": "intermediate",
+    "word": "impact",
+    "pronunciation": "/ˈɪm.pækt/",
+    "meaning": "영향",
+    "example": "The policy had a broad impact.",
+    "related": "environmental impact, impact on"
+  },
+  {
+    "id": "w063",
+    "level": "intermediate",
+    "word": "justify",
+    "pronunciation": "/ˈdʒʌs.tə.faɪ/",
+    "meaning": "정당화하다",
+    "example": "Can you justify that expense?",
+    "related": "justify a choice, hard to justify"
+  },
+  {
+    "id": "w064",
+    "level": "intermediate",
+    "word": "layer",
+    "pronunciation": "/ˈleɪ.ɚ/",
+    "meaning": "층, 층을 이루다",
+    "example": "The cake has three thin layers.",
+    "related": "layer of meaning, outer layer"
+  },
+  {
+    "id": "w065",
+    "level": "intermediate",
+    "word": "monitor",
+    "pronunciation": "/ˈmɑː.nə.tɚ/",
+    "meaning": "관찰하다, 모니터",
+    "example": "We monitor air quality every day.",
+    "related": "monitor closely, heart monitor"
+  },
+  {
+    "id": "w066",
+    "level": "intermediate",
+    "word": "negotiate",
+    "pronunciation": "/nɪˈɡoʊ.ʃi.eɪt/",
+    "meaning": "협상하다",
+    "example": "They negotiated a better contract.",
+    "related": "negotiate with, negotiate terms"
+  },
+  {
+    "id": "w067",
+    "level": "intermediate",
+    "word": "obvious",
+    "pronunciation": "/ˈɑːb.vi.əs/",
+    "meaning": "분명한",
+    "example": "The answer seems obvious now.",
+    "related": "obvious mistake, it is obvious"
+  },
+  {
+    "id": "w068",
+    "level": "advanced",
+    "word": "permit",
+    "pronunciation": "/pɚˈmɪt/",
+    "meaning": "허용하다, 허가증",
+    "example": "The rules do not permit smoking.",
+    "related": "building permit, permit entry"
+  },
+  {
+    "id": "w069",
+    "level": "advanced",
+    "word": "qualify",
+    "pronunciation": "/ˈkwɑː.lə.faɪ/",
+    "meaning": "자격을 얻다",
+    "example": "She qualified for the final round.",
+    "related": "qualify for, highly qualified"
+  },
+  {
+    "id": "w070",
+    "level": "advanced",
+    "word": "remote",
+    "pronunciation": "/rɪˈmoʊt/",
+    "meaning": "먼, 원격의",
+    "example": "He works from a remote village.",
+    "related": "remote control, remote work"
+  },
+  {
+    "id": "w071",
+    "level": "advanced",
+    "word": "shift",
+    "pronunciation": "/ʃɪft/",
+    "meaning": "바꾸다, 이동하다",
+    "example": "Public opinion can shift quickly.",
+    "related": "night shift, shift focus"
+  },
+  {
+    "id": "w072",
+    "level": "advanced",
+    "word": "tackle",
+    "pronunciation": "/ˈtæk.əl/",
+    "meaning": "다루다, 해결하다",
+    "example": "We need to tackle the root cause.",
+    "related": "tackle a problem, tackle directly"
+  },
+  {
+    "id": "w073",
+    "level": "advanced",
+    "word": "unique",
+    "pronunciation": "/juˈniːk/",
+    "meaning": "독특한",
+    "example": "Each neighborhood has a unique character.",
+    "related": "unique feature, truly unique"
+  },
+  {
+    "id": "w074",
+    "level": "advanced",
+    "word": "vary",
+    "pronunciation": "/ˈver.i/",
+    "meaning": "다양하다, 달라지다",
+    "example": "Prices vary by season and location.",
+    "related": "vary widely, vary from"
+  },
+  {
+    "id": "w075",
+    "level": "advanced",
+    "word": "witness",
+    "pronunciation": "/ˈwɪt.nəs/",
+    "meaning": "목격하다, 목격자",
+    "example": "Several people witnessed the accident.",
+    "related": "witness a change, eye witness"
+  },
+  {
+    "id": "w076",
+    "level": "advanced",
+    "word": "ambition",
+    "pronunciation": "/æmˈbɪʃ.ən/",
+    "meaning": "야망, 포부",
+    "example": "Her ambition pushed her to improve.",
+    "related": "career ambition, ambitious goal"
+  },
+  {
+    "id": "w077",
+    "level": "advanced",
+    "word": "boundary",
+    "pronunciation": "/ˈbaʊn.dɚ.i/",
+    "meaning": "경계, 한계",
+    "example": "Healthy boundaries protect your time.",
+    "related": "set boundaries, legal boundary"
+  },
+  {
+    "id": "w078",
+    "level": "advanced",
+    "word": "clarify",
+    "pronunciation": "/ˈkler.ə.faɪ/",
+    "meaning": "명확히 하다",
+    "example": "Could you clarify the final step?",
+    "related": "clarify a point, clarify meaning"
+  },
+  {
+    "id": "w079",
+    "level": "advanced",
+    "word": "distribute",
+    "pronunciation": "/dɪˈstrɪb.juːt/",
+    "meaning": "배포하다, 분배하다",
+    "example": "They distributed the survey online.",
+    "related": "distribute evenly, distribute food"
+  },
+  {
+    "id": "w080",
+    "level": "advanced",
+    "word": "estimate",
+    "pronunciation": "/ˈes.tə.meɪt/",
+    "meaning": "추정하다, 추정치",
+    "example": "We estimated the cost too low.",
+    "related": "rough estimate, estimate that"
+  },
+  {
+    "id": "w081",
+    "level": "advanced",
+    "word": "frank",
+    "pronunciation": "/fræŋk/",
+    "meaning": "솔직한",
+    "example": "She gave me frank feedback.",
+    "related": "frankly speaking, frank discussion"
+  },
+  {
+    "id": "w082",
+    "level": "advanced",
+    "word": "gradual",
+    "pronunciation": "/ˈɡrædʒ.u.əl/",
+    "meaning": "점진적인",
+    "example": "The recovery was slow but gradual.",
+    "related": "gradual change, gradual improvement"
+  },
+  {
+    "id": "w083",
+    "level": "advanced",
+    "word": "hesitant",
+    "pronunciation": "/ˈhez.ə.tənt/",
+    "meaning": "주저하는",
+    "example": "He sounded hesitant on the phone.",
+    "related": "hesitant about, feel hesitant"
+  },
+  {
+    "id": "w084",
+    "level": "advanced",
+    "word": "imply",
+    "pronunciation": "/ɪmˈplaɪ/",
+    "meaning": "암시하다",
+    "example": "His tone implied a hidden concern.",
+    "related": "imply that, strongly imply"
+  },
+  {
+    "id": "w085",
+    "level": "advanced",
+    "word": "logical",
+    "pronunciation": "/ˈlɑː.dʒɪ.kəl/",
+    "meaning": "논리적인",
+    "example": "That seems like the most logical choice.",
+    "related": "logical conclusion, logical step"
+  },
+  {
+    "id": "w086",
+    "level": "advanced",
+    "word": "mutual",
+    "pronunciation": "/ˈmjuː.tʃu.əl/",
+    "meaning": "상호의",
+    "example": "Trust requires mutual respect.",
+    "related": "mutual benefit, mutual friend"
+  },
+  {
+    "id": "w087",
+    "level": "advanced",
+    "word": "notion",
+    "pronunciation": "/ˈnoʊ.ʃən/",
+    "meaning": "개념, 생각",
+    "example": "I rejected the notion immediately.",
+    "related": "common notion, challenge the notion"
+  },
+  {
+    "id": "w088",
+    "level": "advanced",
+    "word": "overlook",
+    "pronunciation": "/ˌoʊ.vɚˈlʊk/",
+    "meaning": "간과하다",
+    "example": "It is easy to overlook small errors.",
+    "related": "overlook a detail, be overlooked"
+  },
+  {
+    "id": "w089",
+    "level": "advanced",
+    "word": "priority",
+    "pronunciation": "/praɪˈɔːr.ə.t̬i/",
+    "meaning": "우선순위",
+    "example": "Safety should be our top priority.",
+    "related": "set priorities, priority task"
+  },
+  {
+    "id": "w090",
+    "level": "advanced",
+    "word": "reflect",
+    "pronunciation": "/rɪˈflekt/",
+    "meaning": "반영하다, 되돌아보다",
+    "example": "The results reflect recent changes.",
+    "related": "reflect on, reflect values"
+  },
+  {
+    "id": "w091",
+    "level": "advanced",
+    "word": "strain",
+    "pronunciation": "/streɪn/",
+    "meaning": "압박, 무리하게 쓰다",
+    "example": "Long hours can strain your eyes.",
+    "related": "financial strain, strain to hear"
+  },
+  {
+    "id": "w092",
+    "level": "advanced",
+    "word": "thrive",
+    "pronunciation": "/θraɪv/",
+    "meaning": "번창하다, 잘 자라다",
+    "example": "Some plants thrive in dry weather.",
+    "related": "thrive on, thrive under pressure"
+  },
+  {
+    "id": "w093",
+    "level": "advanced",
+    "word": "undergo",
+    "pronunciation": "/ˌʌn.dɚˈɡoʊ/",
+    "meaning": "겪다",
+    "example": "The building will undergo repairs.",
+    "related": "undergo treatment, undergo change"
+  },
+  {
+    "id": "w094",
+    "level": "advanced",
+    "word": "vague",
+    "pronunciation": "/veɪɡ/",
+    "meaning": "모호한",
+    "example": "His explanation was too vague.",
+    "related": "vague idea, sound vague"
+  },
+  {
+    "id": "w095",
+    "level": "advanced",
+    "word": "wary",
+    "pronunciation": "/ˈwer.i/",
+    "meaning": "경계하는",
+    "example": "Customers are wary of hidden fees.",
+    "related": "wary of, remain wary"
+  },
+  {
+    "id": "w096",
+    "level": "advanced",
+    "word": "yield",
+    "pronunciation": "/jiːld/",
+    "meaning": "산출하다, 양보하다",
+    "example": "The experiment yielded useful data.",
+    "related": "yield results, yield to"
+  },
+  {
+    "id": "w097",
+    "level": "advanced",
+    "word": "allocate",
+    "pronunciation": "/ˈæl.ə.keɪt/",
+    "meaning": "할당하다",
+    "example": "We allocated more time to testing.",
+    "related": "allocate resources, allocate funds"
+  },
+  {
+    "id": "w098",
+    "level": "advanced",
+    "word": "broaden",
+    "pronunciation": "/ˈbrɔː.dən/",
+    "meaning": "넓히다",
+    "example": "Travel can broaden your perspective.",
+    "related": "broaden horizons, broaden appeal"
+  },
+  {
+    "id": "w099",
+    "level": "advanced",
+    "word": "coherent",
+    "pronunciation": "/koʊˈhɪr.ənt/",
+    "meaning": "일관된",
+    "example": "Her argument was clear and coherent.",
+    "related": "coherent strategy, coherent answer"
+  },
+  {
+    "id": "w100",
+    "level": "advanced",
+    "word": "dedicate",
+    "pronunciation": "/ˈded.ə.keɪt/",
+    "meaning": "헌신하다, 바치다",
+    "example": "She dedicated the weekend to writing.",
+    "related": "dedicate time to, dedicated staff"
+  }
+]

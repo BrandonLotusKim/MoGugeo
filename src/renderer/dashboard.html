@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<!-- 대시보드: 로그인 직후 첫 노출 메인 화면 -->
+<html lang="ko">
+<head>
+  
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; script-src 'self'; connect-src 'self' https:">
+  <title>모국어 - 대시보드</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="shell app-shell">
+    <aside class="sidebar">
+      <!-- 좌측 탐색 메뉴 -->
+      <div class="brand-mark">
+        <h1 class="brand-title">모국어</h1>
+        <p class="brand-subtitle">학습자</p>
+      </div>
+      <nav class="sidebar-nav">
+        <a class="nav-link active" href="dashboard.html"><span class="material-symbols-outlined">dashboard</span><span>대시보드</span></a>
+        <a class="nav-link" href="sentence.html"><span class="material-symbols-outlined">menu_book</span><span>문장 학습</span></a>
+        <a class="nav-link" href="mypage.html"><span class="material-symbols-outlined">insights</span><span>마이페이지</span></a>
+      </nav>
+      <div class="sidebar-cta">
+        <button class="btn btn-primary" data-demo-action type="button">업적 보기</button>
+      </div>
+      <div class="sidebar-footer">
+        <a href="settings.html"><span class="material-symbols-outlined">settings</span><span>설정</span></a>
+        <a href="main.html"><span class="material-symbols-outlined">logout</span><span>로그아웃</span></a>
+      </div>
+    </aside>
+    <div class="main-area">
+    <!-- 커스텀 타이틀바 -->
+    <div class="app-titlebar">
+      <div class="app-titlebar-drag"></div>
+      <div class="topbar-window-btns">
+        <button class="titlebar-btn" id="btn-minimize" type="button">&#x2013;</button>
+        <button class="titlebar-btn" id="btn-maximize" type="button">&#x25A1;</button>
+        <button class="titlebar-btn titlebar-btn-close" id="btn-close" type="button">&#x2715;</button>
+      </div>
+    </div>
+      <header class="topbar">
+        <!-- 상단 브랜드/퀵 액션 영역 -->
+        <a class="topbar-brand" href="dashboard.html">모국어</a>
+        <div class="topbar-actions">
+          <button class="icon-button" id="btn-menu-open" type="button"><span class="material-symbols-outlined">menu</span></button>
+        </div>
+      </header>
+      <div class="page-body-wrap"><main class="page-body">
+        <section class="surface">
+          <!-- 오늘의 상태, 학습 모듈, 최근 활동 통합 본문 -->
+          <div class="hero-grid">
+            <div>
+              <h1 class="hero-title">좋은 아침입니다,<br>학습자님.</h1>
+              <p class="hero-copy">아침 루틴이 기다리고 있습니다. 이미 일일 집중 목표의 40%를 달성하셨네요.</p>
+            </div>
+            <div class="status-card">
+              <div class="progress-row">
+                <div>
+                  <div class="section-label">오늘의 진행도</div>
+                  <h2 class="section-title" id="dash-progress-text">2 / 5</h2>
+                </div>
+              </div>
+              <div class="spacer-top">
+                <div class="progress-bar"><div class="progress-fill" id="dash-progress-bar" style="width: 40%;"></div></div>
+              </div>
+              <p class="fine-copy small spacer-top" id="dash-remaining">스트릭 달성까지 문장 3개 남았습니다.</p>
+            </div>
+          </div>
+
+          <section class="module-grid">
+            <!-- 핵심 학습 모듈 진입 카드 -->
+            <article class="card module-card mint">
+              <div class="feature-icon mint"><span class="material-symbols-outlined">menu_book</span></div>
+              <h3 class="module-title">문장 학습</h3>
+              <p class="module-copy">문맥 중심의 연습을 통해 문장 구조와 흐름을 마스터하세요.</p>
+              <a class="link-action" href="sentence.html">학습하기 <span class="material-symbols-outlined">arrow_forward</span></a>
+            </article>
+          </section>
+
+          <section class="dual-grid">
+            <!-- 최근 피드백과 출석 스트릭 보드 -->
+            <article>
+              <div class="progress-row">
+                <h2 class="section-title">최근 피드백</h2>
+              </div>
+              <div class="card feedback-card spacer-top">
+                <div class="feedback-row">
+                  <div class="avatar">AI</div>
+                  <div>
+                    <p class="section-title" style="color: #fff; font-size: 26px;">"Great job on your grammar today! Your use of past perfect in the essay was impeccable."</p>
+                    <a class="link-action" href="mypage.html">상세 노트 검토하기 <span class="material-symbols-outlined">open_in_new</span></a>
+                  </div>
+                </div>
+              </div>
+            </article>
+            <article>
+              <div class="progress-row">
+                <h2 class="section-title">출석 스트릭</h2>
+                <div class="link-action" style="color: #907700;"><span class="material-symbols-outlined">local_fire_department</span><span id="dash-streak">12일째</span></div>
+              </div>
+              <div class="card spacer-top">
+                <div class="streak-grid">
+                  <div class="streak-head">월</div><div class="streak-head">화</div><div class="streak-head">수</div><div class="streak-head">목</div><div class="streak-head">금</div><div class="streak-head">토</div><div class="streak-head">일</div>
+                  <div class="streak-day active">1</div><div class="streak-day active">2</div><div class="streak-day active">3</div><div class="streak-day active">4</div><div class="streak-day active">5</div><div class="streak-day active">6</div><div class="streak-day active">7</div>
+                  <div class="streak-day active">8</div><div class="streak-day active">9</div><div class="streak-day active">10</div><div class="streak-day active">11</div><div class="streak-day current">12</div><div class="streak-day pending">13</div><div class="streak-day pending">14</div>
+                </div>
+              </div>
+            </article>
+          </section>
+        </section>
+        <footer class="page-footer">
+          <div>© 2026 모국어</div>
+          <nav>
+            <a href="#">고객 센터</a>
+            <a href="settings.html">설정</a>
+            <a href="#">개인정보 처리방침</a>
+            <a href="#">이용 약관</a>
+          </nav>
+        </footer>
+      </main></div>
+    </div>
+  </div>
+  <!-- 슬라이드 메뉴 오버레이 -->
+  <div class="menu-overlay" id="menu-overlay"></div>
+  <aside class="slide-menu" id="slide-menu">
+    <div class="slide-menu-header">
+      <span class="brand-title" style="font-size:20px;">모국어</span>
+      <button class="icon-button" id="btn-menu-close" type="button"><span class="material-symbols-outlined">close</span></button>
+    </div>
+    <nav class="slide-menu-nav">
+      <a href="dashboard.html"><span class="material-symbols-outlined">dashboard</span><span>대시보드</span></a>
+      <a href="sentence.html"><span class="material-symbols-outlined">menu_book</span><span>문장 학습</span></a>
+      <a href="mypage.html"><span class="material-symbols-outlined">insights</span><span>마이페이지</span></a>
+      <a href="settings.html"><span class="material-symbols-outlined">settings</span><span>설정</span></a>
+    </nav>
+    <div class="slide-menu-footer">
+      <a class="btn btn-ghost" id="btn-logout" href="#">로그아웃</a>
+    </div>
+  </aside>
+  <script src="data-loader.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
+

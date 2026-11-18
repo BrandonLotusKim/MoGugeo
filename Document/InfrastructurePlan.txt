@@ -1,0 +1,48 @@
+﻿============================================================
+📌 인프라 준비 계획
+============================================================
+
+1. DigitalOcean 자원 정의
+- App Platform 1개
+- Managed PostgreSQL 1개
+- Spaces 버킷 1개
+
+2. 각 자원의 역할
+[App Platform]
+- Next.js 웹 서비스 배포
+- 사용자 접속 페이지 제공
+- 다운로드 안내 페이지 제공
+- 관리자 로그인 및 게시판 관리 화면 제공
+
+[Managed PostgreSQL]
+- 관리자 계정 정보 저장
+- 게시글 데이터 저장
+- 향후 카테고리 및 권한 데이터 저장
+
+[Spaces]
+- Windows 설치 파일 저장
+- 향후 정적 업로드 파일 저장 가능
+
+3. 환경 이름 규칙
+- local
+- dev
+- prod
+
+4. 릴리즈 파일 이름 규칙
+- JM_Lab-Board-Setup-{version}.exe
+예시:
+- JM_Lab-Board-Setup-1.0.0.exe
+- JM_Lab-Board-Setup-1.0.1.exe
+
+5. DB 연결명 규칙
+- JM_LAB_BOARD_DB_URL_DEV
+- JM_LAB_BOARD_DB_URL_PROD
+
+6. URL 구조 초안
+- https://app.example.com : 실제 서비스 웹앱
+- https://download.example.com : 설치 파일 안내 및 다운로드
+- https://app.example.com/admin : 관리자 화면
+
+============================================================
+✅ END OF DOCUMENT
+============================================================

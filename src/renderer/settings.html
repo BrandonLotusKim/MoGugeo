@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<!-- 설정 화면: 앱 실행 방식과 학습 옵션 조정 -->
+<html lang="ko">
+<head>
+  
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; script-src 'self'; connect-src 'self' https:">
+  <title>모국어 - 설정</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="shell app-shell">
+    <aside class="sidebar">
+      <div class="brand-mark">
+        <h1 class="brand-title">모국어</h1>
+        <p class="brand-subtitle">학습자</p>
+      </div>
+      <nav class="sidebar-nav">
+        <a class="nav-link" href="dashboard.html"><span class="material-symbols-outlined">dashboard</span><span>대시보드</span></a>
+        <a class="nav-link" href="sentence.html"><span class="material-symbols-outlined">menu_book</span><span>문장 학습</span></a>
+        <a class="nav-link" href="mypage.html"><span class="material-symbols-outlined">insights</span><span>마이페이지</span></a>
+      </nav>
+      <div class="sidebar-cta">
+        <a class="btn btn-primary" href="popup.html">팝업 미리보기</a>
+      </div>
+      <div class="sidebar-footer">
+        <a href="settings.html"><span class="material-symbols-outlined">settings</span><span>설정</span></a>
+        <a href="main.html"><span class="material-symbols-outlined">logout</span><span>로그아웃</span></a>
+      </div>
+    </aside>
+    <div class="main-area">
+    <!-- 커스텀 타이틀바 -->
+    <div class="app-titlebar">
+      <div class="app-titlebar-drag"></div>
+      <div class="topbar-window-btns">
+        <button class="titlebar-btn" id="btn-minimize" type="button">&#x2013;</button>
+        <button class="titlebar-btn" id="btn-maximize" type="button">&#x25A1;</button>
+        <button class="titlebar-btn titlebar-btn-close" id="btn-close" type="button">&#x2715;</button>
+      </div>
+    </div>
+      <header class="topbar">
+        <a class="topbar-brand" href="dashboard.html">모국어</a>
+        <div class="topbar-actions">
+          <button class="icon-button" id="btn-menu-open" type="button"><span class="material-symbols-outlined">menu</span></button>
+        </div>
+      </header>
+      <div class="page-body-wrap"><main class="page-body">
+        <section class="surface">
+          <!-- 현재 루틴 요약, 실행 설정, 학습 설정, 계정 관리 -->
+          <div class="hero-grid">
+            <div>
+              <div class="section-label">Settings</div>
+              <h1 class="hero-title" style="font-size: clamp(38px, 4vw, 58px);">학습 루틴과<br>실행 방식을 조정합니다.</h1>
+              <p class="hero-copy">시안에 있던 계정 관리 구역의 구조를 확장해서, 알림 시간과 자동 실행, 난이도, 계정 액션을 한 페이지에 정리했습니다.</p>
+            </div>
+            <div class="status-card">
+              <div class="section-label">현재 루틴</div>
+              <h2 class="section-title spacer-top">오전 08:30 자동 시작</h2>
+              <p class="hero-copy">Windows 실행 시 자동 시작과 자동 로그인이 켜져 있습니다.</p>
+            </div>
+          </div>
+
+          <section class="board-grid spacer-lg">
+            <!-- 좌측 실행/알림, 우측 학습 옵션 -->
+            <article class="card">
+              <div class="section-label">알림 및 실행</div>
+              <div class="field spacer-top">
+                <label for="popup-time">학습 팝업 시간</label>
+                <input class="text-input" id="popup-time" type="time" value="08:30">
+              </div>
+              <div class="setting-row">
+                <div class="setting-info"><span class="material-symbols-outlined">notifications</span><span>데일리 팝업 사용</span></div>
+                <button class="switch on" id="daily-popup-toggle" role="switch" aria-checked="true" type="button"></button>
+              </div>
+              <div class="setting-row">
+                <div class="setting-info"><span class="material-symbols-outlined">computer</span><span>Windows 시작 시 자동 실행</span></div>
+                <button class="switch on" id="auto-start-toggle" role="switch" aria-checked="true" type="button"></button>
+              </div>
+              <div class="setting-row">
+                <div class="setting-info"><span class="material-symbols-outlined">key</span><span>자동 로그인 유지</span></div>
+                <button class="switch on" id="auto-login-toggle" role="switch" aria-checked="true" type="button"></button>
+              </div>
+            </article>
+            <article class="card">
+              <div class="section-label">학습 옵션</div>
+              <div class="field spacer-top">
+                <label for="difficulty">난이도</label>
+                <select class="text-input" id="difficulty">
+                  <option>초급</option>
+                  <option selected>중급</option>
+                  <option>고급</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="learning-type">학습 유형</label>
+                <select class="text-input" id="learning-type">
+                  <option selected>문장 해석 중심</option>
+                </select>
+              </div>
+            </article>
+          </section>
+
+          <section class="card spacer-lg">
+            <!-- 이메일/비밀번호/구독 계정 제어 영역 -->
+            <div class="section-label">계정</div>
+            <div class="account-grid spacer-top">
+              <div>
+                <div class="setting-row">
+                  <div class="setting-info"><span class="material-symbols-outlined">mail</span><span>arthur.scholar@email.com</span></div>
+                  <button class="btn btn-ghost" data-demo-action type="button">이메일 변경</button>
+                </div>
+                <div class="setting-row">
+                  <div class="setting-info"><span class="material-symbols-outlined">lock</span><span>비밀번호</span></div>
+                  <button class="btn btn-ghost" data-demo-action type="button">비밀번호 변경</button>
+                </div>
+              </div>
+              <div>
+                <div class="setting-row">
+                  <div class="setting-info"><span class="material-symbols-outlined">credit_card</span><span>Scholar 프리미엄 플랜</span></div>
+                  <span class="chip gold">활성</span>
+                </div>
+                <div class="spacer-top">
+                  <a class="btn btn-ghost" data-logout-link href="#">로그아웃</a>
+                </div>
+              </div>
+            </div>
+            <div class="setting-row spacer-top">
+              <div class="setting-info">
+                <span class="material-symbols-outlined">bug_report</span>
+                <div>
+                  <strong>문제 신고</strong>
+                  <p class="fine-copy">버그나 콘텐츠 오류를 발견하면 알려주세요.</p>
+                </div>
+              </div>
+              <button class="btn btn-ghost" id="btn-report-issue" type="button">문제 신고</button>
+            </div>
+          </section>
+        </section>
+        <footer class="page-footer">
+          <div>© 2026 모국어</div>
+          <nav>
+            <a href="#">고객 센터</a>
+            <a href="mypage.html">마이페이지</a>
+            <a href="#">개인정보 처리방침</a>
+            <a href="#">이용 약관</a>
+          </nav>
+        </footer>
+      </main></div>
+    </div>
+  </div>
+  <!-- 슬라이드 메뉴 오버레이 -->
+  <div class="menu-overlay" id="menu-overlay"></div>
+  <aside class="slide-menu" id="slide-menu">
+    <div class="slide-menu-header">
+      <span class="brand-title" style="font-size:20px;">모국어</span>
+      <button class="icon-button" id="btn-menu-close" type="button"><span class="material-symbols-outlined">close</span></button>
+    </div>
+    <nav class="slide-menu-nav">
+      <a href="dashboard.html"><span class="material-symbols-outlined">dashboard</span><span>대시보드</span></a>
+      <a href="sentence.html"><span class="material-symbols-outlined">menu_book</span><span>문장 학습</span></a>
+      <a href="mypage.html"><span class="material-symbols-outlined">insights</span><span>마이페이지</span></a>
+      <a href="settings.html"><span class="material-symbols-outlined">settings</span><span>설정</span></a>
+    </nav>
+    <div class="slide-menu-footer">
+      <a class="btn btn-ghost" id="btn-logout" href="#">로그아웃</a>
+    </div>
+  </aside>
+  <script src="data-loader.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

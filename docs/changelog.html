@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Changelog | 모국어 (MoGugeo)</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="site-shell">
+    <header class="page-header">
+      <a class="back-link" href="index.html">← 메인으로 돌아가기</a>
+      <h1>변경 이력</h1>
+      <p class="page-subtitle">모국어(MoGugeo) 릴리스 및 준비 중인 변경 사항입니다.</p>
+    </header>
+
+    <main class="panel markdown-body">
+      <h1>Changelog</h1>
+      <p>본 파일은 <a href="https://keepachangelog.com/ko/1.1.0/">Keep a Changelog</a> 형식을 따른다.</p>
+
+      <h2>[Unreleased]</h2>
+
+      <h3>Added</h3>
+      <ul>
+        <li>콘텐츠 외부 JSON 분리 — <code>src/data/sentences.json</code>, <code>words.json</code>, <code>expressions.json</code>, <code>meta.json</code></li>
+        <li>데이터 로더 (<code>src/renderer/data-loader.js</code>) — fetch + file:// XHR 폴백</li>
+        <li>콘텐츠 분량 보강 — 문장 50 / 단어 100 / 표현 30 (한글 정상)</li>
+        <li>설계 문서 — <code>FeatureSpec.md</code>(5개 기능 상세 정의), <code>Architecture-v2.md</code>(DB·인프라), <code>Roadmap.md</code>(통합 체크리스트)</li>
+        <li>개인정보 처리방침 / 이용약관 초안</li>
+        <li>GitHub Actions CI + Release 워크플로</li>
+        <li>빌드 검증 스크립트 (<code>scripts/verify-build.ps1</code>)</li>
+      </ul>
+
+      <h3>Changed</h3>
+      <ul>
+        <li>학습 데이터를 코드에서 분리 — 콘텐츠 갱신이 빌드 없이 가능</li>
+        <li>문서를 학습 앱 컨셉으로 전면 재정비 (기존 "공용 게시판" 컨셉 폐기)</li>
+        <li>인프라 방향 확정 — Supabase + GitHub <strong>무료 스택</strong> (유료 DigitalOcean 사용 안 함)</li>
+        <li>회원가입 방식 정의 — 아이디 기반 (이메일 인증 아님), 게스트 모드 없음</li>
+        <li>데일리 팝업 정의 — 영↔한 양방향 2문제, Windows Task Scheduler 로 앱 실행 여부와 무관하게 트리거</li>
+      </ul>
+
+      <h3>Disabled</h3>
+      <ul>
+        <li>단어 학습·원어민 표현 화면 비활성화 — <code>src/renderer/_disabled/</code> 로 백업, 4개 화면의 진입로 제거, <code>app.js</code> 호출 제거, 패키징에서 제외</li>
+        <li>레벨 시스템 — 제거 결정 (mypage 코드 제거는 STAGE C-9 예정)</li>
+      </ul>
+
+      <h3>미구현 (STAGE C 예정 — 정의만 완료)</h3>
+      <ul>
+        <li>데일리 팝업 정시 스케줄러 / 자동 시작 / 실제 채점 / 콘텐츠 연동 / 하루 1회 가드</li>
+        <li>채점 알고리즘 개선 (현재 단순 키워드 매칭)</li>
+        <li>복습 큐 UI / 망각곡선</li>
+        <li>다크모드 CSS 변수 배선 / TTS / 설정 실시간 반영 / localStorage 스키마 버전</li>
+      </ul>
+
+      <h2>[1.0.0] - 2026-04-10</h2>
+
+      <h3>Added</h3>
+      <ul>
+        <li>초기 Electron 빌드</li>
+        <li>로그인/회원가입 UI (목업)</li>
+        <li>대시보드 / 문장 학습 / 단어 학습 / 원어민 표현 / 마이페이지 / 설정 페이지</li>
+        <li>시스템 트레이 + 데일리 팝업 윈도우</li>
+        <li>커스텀 프레임리스 타이틀바</li>
+        <li>NSIS 인스톨러 빌드 (<code>MoGugeo-Setup-1.0.0.exe</code>)</li>
+        <li>학습 데이터 8문장 + 10단어 (하드코딩)</li>
+        <li>키워드 매칭 채점 (초기 버전)</li>
+        <li>스트릭 시스템 (localStorage)</li>
+      </ul>
+    </main>
+  </div>
+</body>
+</html>

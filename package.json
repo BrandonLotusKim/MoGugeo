@@ -1,0 +1,65 @@
+{
+    "name": "mogugeo",
+    "version": "1.0.0",
+    "description": "MoGugeo desktop learning app",
+    "author": "BrandonLotusKim",
+    "main": "dist/main.js",
+    "scripts": {
+        "build": "tsc",
+        "start": "npm run build && electron .",
+        "dist": "npm run build && electron-builder --win nsis && powershell -NoProfile -ExecutionPolicy Bypass -File scripts/rename-output.ps1"
+    },
+    "build": {
+        "appId": "com.brandonlotuskim.mogugeo",
+        "productName": "모국어",
+        "directories": {
+            "output": "release",
+            "buildResources": "build"
+        },
+        "files": [
+            "dist/**/*",
+            "src/data/**/*",
+            "src/renderer/**/*",
+            "!src/renderer/_disabled/**",
+            "package.json"
+        ],
+        "extraResources": [
+            {
+                "from": "build/app-logo.ico",
+                "to": "app-logo.ico"
+            }
+        ],
+        "afterPack": "./scripts/afterPack.js",
+        "win": {
+            "verifyUpdateCodeSignature": false,
+            "target": [
+                {
+                    "target": "nsis",
+                    "arch": [
+                        "x64"
+                    ]
+                }
+            ],
+            "icon": "build/app-logo.ico",
+            "signAndEditExecutable": false,
+            "executableName": "MoGugeo"
+        },
+        "nsis": {
+            "oneClick": false,
+            "allowToChangeInstallationDirectory": true,
+            "createDesktopShortcut": true,
+            "createStartMenuShortcut": true,
+            "shortcutName": "모국어",
+            "installerIcon": "build/setup-logo.ico",
+            "uninstallerIcon": "build/setup-logo.ico"
+        }
+    },
+    "devDependencies": {
+        "@types/node": "^24.0.0",
+        "electron": "^37.2.0",
+        "electron-builder": "^26.0.12",
+        "rcedit": "^5.0.2",
+        "sharp": "^0.34.5",
+        "typescript": "^5.9.2"
+    }
+}

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<!-- 단어 학습 화면: 단어 문제와 보조 정보 확인 -->
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>모국어 - 단어 학습</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="shell app-shell">
+    <aside class="sidebar">
+      <div class="brand-mark">
+        <h1 class="brand-title">모국어</h1>
+        <p class="brand-subtitle">레벨 4 학습자</p>
+      </div>
+      <nav class="sidebar-nav">
+        <a class="nav-link" href="dashboard.html"><span class="material-symbols-outlined">dashboard</span><span>대시보드</span></a>
+        <a class="nav-link" href="sentence.html"><span class="material-symbols-outlined">menu_book</span><span>문장 학습</span></a>
+        <a class="nav-link active" href="vocabulary.html"><span class="material-symbols-outlined">translate</span><span>단어 학습</span></a>
+        <a class="nav-link" href="expressions.html"><span class="material-symbols-outlined">record_voice_over</span><span>원어민 표현</span></a>
+        <a class="nav-link" href="mypage.html"><span class="material-symbols-outlined">insights</span><span>마이페이지</span></a>
+      </nav>
+      <div class="sidebar-cta">
+        <button class="btn btn-secondary" data-demo-action type="button">복습 카드 보기</button>
+      </div>
+      <div class="sidebar-footer">
+        <a href="settings.html"><span class="material-symbols-outlined">settings</span><span>설정</span></a>
+        <a href="main.html"><span class="material-symbols-outlined">logout</span><span>로그아웃</span></a>
+      </div>
+    </aside>
+    <div class="main-area">
+    <!-- 커스텀 타이틀바 -->
+    <div class="app-titlebar">
+      <div class="app-titlebar-drag"></div>
+      <div class="topbar-window-btns">
+        <button class="titlebar-btn" id="btn-minimize" type="button">&#x2013;</button>
+        <button class="titlebar-btn" id="btn-maximize" type="button">&#x25A1;</button>
+        <button class="titlebar-btn titlebar-btn-close" id="btn-close" type="button">&#x2715;</button>
+      </div>
+    </div>
+      <header class="topbar">
+        <a class="topbar-brand" href="dashboard.html">모국어</a>
+        <div class="topbar-actions">
+          <button class="icon-button" id="btn-menu-open" type="button"><span class="material-symbols-outlined">menu</span></button>
+        </div>
+      </header>
+      <div class="page-body-wrap"><main class="page-body">
+        <section class="surface">
+          <!-- 진행도와 문제 카드, 보조 정보 패널 -->
+          <div class="hero-grid">
+            <div>
+              <div class="section-label">Word Challenge</div>
+              <h1 class="hero-title" style="font-size: clamp(38px, 4vw, 58px);">오늘의 핵심 단어를<br>정확하게 익힙니다.</h1>
+              <p class="hero-copy">단어 의미, 발음, 예문, 파생 표현을 같은 화면에 묶어 깔끔한 학습 흐름을 제공합니다.</p>
+            </div>
+            <div class="status-card">
+              <div class="progress-row">
+                <div>
+                  <div class="section-label">오늘의 진행도</div>
+                  <h2 class="section-title" id="vocab-progress">0 / 10 단어</h2>
+                </div>
+                <span class="chip gold" id="vocab-accuracy">정답률 0%</span>
+              </div>
+              <div class="spacer-top">
+                <div class="progress-bar"><div class="progress-fill" id="vocab-progress-bar" style="width: 0%;"></div></div>
+              </div>
+            </div>
+          </div>
+
+          <section class="board-grid spacer-lg">
+            <!-- 좌측은 문제, 우측은 발음/예문/정답 예시 -->
+            <article class="card">
+              <div class="section-label">문제 유형</div>
+              <h2 class="section-title spacer-top" id="vocab-word">grateful</h2>
+              <p class="hero-copy">뜻을 입력해보세요.</p>
+              <div class="field spacer-top">
+                <label for="vocab-answer">답안 입력</label>
+                <input class="text-input" id="vocab-answer" type="text" placeholder="예: 감사한">
+              </div>
+              <div class="inline-actions spacer-top">
+                <button class="btn btn-primary" id="vocab-check" type="button">정답 확인</button>
+                <button class="btn btn-ghost" id="vocab-next" type="button">다음 문제</button>
+              </div>
+              <div id="vocab-result" class="spacer-top" style="display:none;"></div>
+            </article>
+            <article class="card">
+              <div class="section-label">추가 정보</div>
+              <div class="list-stack spacer-top" id="vocab-info-panel" style="visibility:hidden;">
+                <div class="list-item"><strong>발음</strong><span class="muted" id="vocab-pron">/ˈɡreɪt.fəl/</span></div>
+                <div class="list-item"><strong>예문</strong><span class="muted" id="vocab-example">I am grateful for your help.</span></div>
+                <div class="list-item"><strong>정답 예시</strong><span class="muted" id="vocab-meaning">감사한, 고마워하는</span></div>
+                <div class="list-item"><strong>연관 표현</strong><span class="muted" id="vocab-related">grateful to, grateful for</span></div>
+              </div>
+            </article>
+          </section>
+        </section>
+        <footer class="page-footer">
+          <div>© 2026 모국어</div>
+          <nav>
+            <a href="#">고객 센터</a>
+            <a href="settings.html">설정</a>
+            <a href="#">개인정보 처리방침</a>
+            <a href="#">이용 약관</a>
+          </nav>
+        </footer>
+      </main></div>
+    </div>
+  </div>
+  <!-- 슬라이드 메뉴 오버레이 -->
+  <div class="menu-overlay" id="menu-overlay"></div>
+  <aside class="slide-menu" id="slide-menu">
+    <div class="slide-menu-header">
+      <span class="brand-title" style="font-size:20px;">모국어</span>
+      <button class="icon-button" id="btn-menu-close" type="button"><span class="material-symbols-outlined">close</span></button>
+    </div>
+    <nav class="slide-menu-nav">
+      <a href="dashboard.html"><span class="material-symbols-outlined">dashboard</span><span>대시보드</span></a>
+      <a href="sentence.html"><span class="material-symbols-outlined">menu_book</span><span>문장 학습</span></a>
+      <a href="vocabulary.html"><span class="material-symbols-outlined">translate</span><span>단어 학습</span></a>
+      <a href="expressions.html"><span class="material-symbols-outlined">record_voice_over</span><span>원어민 표현</span></a>
+      <a href="mypage.html"><span class="material-symbols-outlined">insights</span><span>마이페이지</span></a>
+      <a href="settings.html"><span class="material-symbols-outlined">settings</span><span>설정</span></a>
+    </nav>
+    <div class="slide-menu-footer">
+      <a class="btn btn-ghost" id="btn-logout" href="#">로그아웃</a>
+    </div>
+  </aside>
+  <script src="data-loader.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

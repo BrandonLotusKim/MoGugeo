@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+
+jobs:
+  typecheck:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: TypeScript build
+        run: npm run build
+
+      - name: Verify renderer assets
+        shell: pwsh
+        run: |
+          $required = @(
+            'src/renderer/main.html',
+            'src/renderer/dashboard.html',
+            'src/renderer/sentence.html',
+            'src/renderer/popup.html',
+            'src/renderer/app.js',
+            'src/renderer/styles.css'
+          )
+          foreach ($f in $required) {
+            if (-not (Test-Path $f)) {
+              Write-Error "Missing required file: $f"
+              exit 1
+            }
+          }
+          Write-Host "All renderer assets present."
+
+      - name: Verify content data
+        shell: pwsh
+        run: |
+          $data = @('src/data/sentences.json', 'src/data/words.json', 'src/data/expressions.json', 'src/data/meta.json')
+          foreach ($f in $data) {
+            if (Test-Path $f) {
+              $json = Get-Content $f -Raw | ConvertFrom-Json
+              Write-Host "$f OK"
+            } else {
+              Write-Host "::warning::Missing data file: $f"
+            }
+          }
