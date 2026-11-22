@@ -1,134 +1,24 @@
+/* 모국어 렌더러: 화면별 초기화와 DOM 처리. 계산 로직은 core.js(MoGugeoCore)에 있다. */
+
+const Core = window.MoGugeoCore;
 const STATE_KEY = "mogugeo_state";
-const CURRENT_SCHEMA_VERSION = 4;
+const OS_SYNC_KEY = "mogugeo_os_synced";
+const ISSUES_URL = "https://github.com/BrandonLotusKim/MoGugeo/issues";
 
-function getDefaultState() {
-  return {
-    schemaVersion: 4,
-    darkMode: false,
-    onboardingSeen: false,
-    streak: 0,
-    lastStudyDate: null,
-    lastPopupDate: null,
-    sentenceIndex: 0,
-    sentenceCorrect: 0,
-    vocabIndex: 0,
-    vocabCorrect: 0,
-    totalStudyDays: 0,
-    reviewList: [],
-    studyLog: [],
-    settings: {
-      dailyPopupEnabled: true,
-      popupTime: "08:30",
-      autoStart: true,
-      autoLogin: true,
-      difficulty: "Intermediate",
-      learningType: "Sentence + Vocabulary + Expressions",
-    },
-  };
-}
-
-function getDefaultSettings() {
-  return { ...getDefaultState().settings };
-}
-
-function normalizeSettings(settings) {
-  const defaults = getDefaultSettings();
-  const source = settings && typeof settings === "object" && !Array.isArray(settings) ? settings : {};
-
-  return {
-    dailyPopupEnabled: typeof source.dailyPopupEnabled === "boolean"
-      ? source.dailyPopupEnabled
-      : defaults.dailyPopupEnabled,
-    popupTime: typeof source.popupTime === "string" && source.popupTime.trim()
-      ? source.popupTime
-      : defaults.popupTime,
-    autoStart: typeof source.autoStart === "boolean" ? source.autoStart : defaults.autoStart,
-    autoLogin: typeof source.autoLogin === "boolean" ? source.autoLogin : defaults.autoLogin,
-    difficulty: typeof source.difficulty === "string" && source.difficulty.trim()
-      ? source.difficulty
-      : defaults.difficulty,
-    learningType: typeof source.learningType === "string" && source.learningType.trim()
-      ? source.learningType
-      : defaults.learningType,
-  };
-}
-
-function migrateState(saved, fromVersion, toVersion) {
-  if (!saved || typeof saved !== "object" || Array.isArray(saved)) {
-    return getDefaultState();
-  }
-
-  if (fromVersion > toVersion) {
-    return saved;
-  }
-
-  let migrated = saved;
-  let currentVersion = fromVersion;
-
-  if (currentVersion < 1) {
-    migrated = Object.assign(getDefaultState(), saved, { schemaVersion: 1 });
-    currentVersion = 1;
-  }
-
-  while (currentVersion < toVersion) {
-    switch (currentVersion) {
-      case 1:
-        migrated = Object.assign({}, migrated, {
-          reviewList: normalizeReviewList(migrated.reviewList),
-          schemaVersion: 2,
-        });
-        currentVersion = 2;
-        break;
-      case 2:
-        migrated = Object.assign({}, migrated, {
-          studyLog: Array.isArray(migrated.studyLog) ? migrated.studyLog : [],
-          schemaVersion: 3,
-        });
-        currentVersion = 3;
-        break;
-      case 3:
-        migrated = Object.assign({}, migrated, {
-          onboardingSeen: typeof migrated.onboardingSeen === "boolean" ? migrated.onboardingSeen : false,
-          schemaVersion: 4,
-        });
-        currentVersion = 4;
-        break;
-      default:
-        return migrated;
-    }
-  }
-
-  return Object.assign(getDefaultState(), migrated, {
-    schemaVersion: toVersion,
-    settings: normalizeSettings(migrated.settings),
-  });
-}
+/* ---------- 상태 ---------- */
 
 function getState() {
   try {
     const saved = localStorage.getItem(STATE_KEY);
-    if (!saved) return getDefaultState();
+    if (!saved) return Core.getDefaultState();
     const parsed = JSON.parse(saved);
-    const savedSchemaVersion = Number.isInteger(parsed?.schemaVersion) ? parsed.schemaVersion : 0;
-
-    if (savedSchemaVersion !== CURRENT_SCHEMA_VERSION) {
-      const migrated = migrateState(parsed, savedSchemaVersion, CURRENT_SCHEMA_VERSION);
-
-      if (migrated.schemaVersion === CURRENT_SCHEMA_VERSION) {
-        saveState(migrated);
-      }
-
-      return migrated;
+    const migrated = Core.migrateState(parsed, new Date());
+    if (parsed?.schemaVersion !== Core.CURRENT_SCHEMA_VERSION && migrated.schemaVersion === Core.CURRENT_SCHEMA_VERSION) {
+      saveState(migrated);
     }
-
-    return Object.assign(getDefaultState(), parsed, {
-      settings: normalizeSettings(parsed.settings),
-      reviewList: normalizeReviewList(parsed.reviewList),
-      studyLog: Array.isArray(parsed.studyLog) ? parsed.studyLog : [],
-      onboardingSeen: typeof parsed.onboardingSeen === "boolean" ? parsed.onboardingSeen : false,
-    });
+    return migrated;
   } catch {
-    return getDefaultState();
+    return Core.getDefaultState();
   }
 }
 
@@ -140,1410 +30,152 @@ function getSentences() {
   return window.MoGugeoData?.sentences || [];
 }
 
-function getWords() {
-  return window.MoGugeoData?.words || [];
+function getSentenceMap() {
+  return new Map(getSentences().map((sentence) => [Core.getSentenceId(sentence), sentence]));
 }
 
-function getExpressions() {
-  return window.MoGugeoData?.expressions || [];
+function getNickname(state) {
+  return state.profile?.nickname || "학습자";
 }
 
-function getTodayReviewDate() {
-  const date = new Date();
-  date.setHours(0, 0, 0, 0);
-  return date.toISOString();
+/* ---------- DOM 도우미 ---------- */
+
+function $(selector, root = document) {
+  return root.querySelector(selector);
 }
 
-function getNextReviewDate(level) {
-  const reviewDays = [1, 3, 7, 30];
-  const normalizedLevel = Math.max(0, Math.min(3, Number(level) || 0));
-  const date = new Date();
-  date.setHours(0, 0, 0, 0);
-  date.setDate(date.getDate() + reviewDays[normalizedLevel]);
-  return date.toISOString();
+function $all(selector, root = document) {
+  return Array.from(root.querySelectorAll(selector));
 }
 
-function normalizeReviewList(reviewList) {
-  if (!Array.isArray(reviewList)) return [];
-
-  const seen = new Set();
-  return reviewList.reduce((items, entry) => {
-    let item = null;
-
-    if (typeof entry === "string" && entry.trim()) {
-      item = {
-        contentId: entry,
-        type: "sentence",
-        level: 0,
-        nextReviewAt: getTodayReviewDate(),
-        lastReviewedAt: null,
-      };
-    } else if (entry && typeof entry === "object" && !Array.isArray(entry)) {
-      const contentId = typeof entry.contentId === "string" ? entry.contentId.trim() : "";
-      if (!contentId) return items;
-
-      item = {
-        contentId,
-        type: entry.type === "sentence" ? "sentence" : "sentence",
-        level: Math.max(0, Math.min(3, Number(entry.level) || 0)),
-        nextReviewAt: typeof entry.nextReviewAt === "string" ? entry.nextReviewAt : getTodayReviewDate(),
-        lastReviewedAt: typeof entry.lastReviewedAt === "string" ? entry.lastReviewedAt : null,
-      };
-    }
-
-    if (!item || seen.has(item.contentId)) return items;
-
-    seen.add(item.contentId);
-    items.push(item);
-    return items;
-  }, []);
-}
-
-function addToReviewQueue(contentId, type, sourceState) {
-  if (!contentId) return false;
-
-  const state = sourceState || getState();
-  if (state.reviewList.some((item) => item.contentId === contentId)) {
-    return false;
-  }
-
-  state.reviewList.push({
-    contentId,
-    type: type === "sentence" ? "sentence" : "sentence",
-    level: 0,
-    nextReviewAt: getTodayReviewDate(),
-    lastReviewedAt: null,
-  });
-
-  if (!sourceState) saveState(state);
-  return true;
-}
-
-function updateReviewItem(contentId, isCorrect, sourceState) {
-  const state = sourceState || getState();
-  const item = state.reviewList.find((reviewItem) => reviewItem.contentId === contentId);
-  if (!item) return false;
-
-  item.lastReviewedAt = new Date().toISOString();
-  if (isCorrect) {
-    item.level = Math.min(item.level + 1, 3);
-    item.nextReviewAt = getNextReviewDate(item.level);
-  } else {
-    item.level = 0;
-    item.nextReviewAt = getTodayReviewDate();
-  }
-
-  if (!sourceState) saveState(state);
-  return true;
-}
-
-function getDueReviewItems(sourceState) {
-  const state = sourceState || getState();
-  const now = Date.now();
-  return state.reviewList.filter((item) => Date.parse(item.nextReviewAt) <= now);
-}
-
-function getSentenceContentId(data) {
-  return data?.id || data?.english || "";
-}
-
-function getStudyLog(state) {
-  if (!Array.isArray(state.studyLog)) {
-    state.studyLog = [];
-  }
-  return state.studyLog;
-}
-
-function hasNoStudyData(state) {
-  return state.totalStudyDays === 0 || getStudyLog(state).length === 0;
-}
-
-function createEmptyState(message, linkText = "문장 학습 시작", href = "sentence.html") {
-  const empty = document.createElement("div");
-  empty.className = "empty-state";
-
-  const copy = document.createElement("p");
-  copy.className = "empty-state-copy";
-  copy.textContent = message;
-
-  const link = document.createElement("a");
-  link.className = "btn btn-soft empty-state-link";
-  link.href = href;
-  link.textContent = linkText;
-
-  empty.append(copy, link);
-  return empty;
-}
-
-function normalizeDifficulty(level) {
-  return String(level || "").trim().toLowerCase();
-}
-
-function shuffleArray(items) {
-  const copy = [...items];
-  for (let i = copy.length - 1; i > 0; i -= 1) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [copy[i], copy[j]] = [copy[j], copy[i]];
-  }
-  return copy;
-}
-
-function pickPopupSentences(state) {
-  const sentences = getSentences();
-  if (!sentences.length) return [];
-
-  const selected = [];
-  const selectedIds = new Set();
-  const sentenceMap = new Map(
-    sentences.map((sentence) => [getSentenceContentId(sentence), sentence])
-  );
-
-  function takeCandidates(candidates) {
-    candidates.forEach((sentence) => {
-      if (!sentence || selected.length >= 2) return;
-
-      const contentId = getSentenceContentId(sentence);
-      if (!contentId || selectedIds.has(contentId)) return;
-
-      selected.push(sentence);
-      selectedIds.add(contentId);
+function el(tag, options = {}, children = []) {
+  const node = document.createElement(tag);
+  if (options.className) node.className = options.className;
+  if (options.text !== undefined) node.textContent = options.text;
+  if (options.attrs) {
+    Object.entries(options.attrs).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) node.setAttribute(key, value);
     });
   }
-
-  const dueReviewSentences = getDueReviewItems(state)
-    .filter((item) => item.type === "sentence")
-    .map((item) => sentenceMap.get(item.contentId))
-    .filter(Boolean);
-  takeCandidates(dueReviewSentences);
-
-  if (selected.length < 2) {
-    const studiedSentenceIds = new Set(
-      getStudyLog(state)
-        .map((entry) => entry?.contentId)
-        .filter(Boolean)
-    );
-    const targetDifficulty = normalizeDifficulty(state.settings?.difficulty);
-    const unseenMatchingDifficulty = shuffleArray(
-      sentences.filter((sentence) => {
-        const contentId = getSentenceContentId(sentence);
-        return (
-          contentId &&
-          !selectedIds.has(contentId) &&
-          !studiedSentenceIds.has(contentId) &&
-          normalizeDifficulty(sentence.level) === targetDifficulty
-        );
-      })
-    );
-    takeCandidates(unseenMatchingDifficulty);
-  }
-
-  if (selected.length < 2) {
-    takeCandidates(
-      shuffleArray(
-        sentences.filter((sentence) => !selectedIds.has(getSentenceContentId(sentence)))
-      )
-    );
-  }
-
-  return selected;
-}
-
-function $(selector) {
-  return document.querySelector(selector);
-}
-
-function speakText(text, lang = "en-US") {
-  const content = String(text || "").trim();
-  if (!content) return;
-
-  if (!window.speechSynthesis || typeof window.SpeechSynthesisUtterance === "undefined") {
-    console.warn("Speech synthesis is unavailable in this environment.");
-    return;
-  }
-
-  window.speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(content);
-  utterance.lang = lang;
-  window.speechSynthesis.speak(utterance);
-}
-
-const TOKEN_ENDINGS = ["입니다", "합니다", "있어요", "해요", "이다", "은", "는", "이", "가", "을", "를"];
-
-function levenshtein(a, b) {
-  const rows = a.length + 1;
-  const cols = b.length + 1;
-  const dp = Array.from({ length: rows }, () => Array(cols).fill(0));
-
-  for (let i = 0; i < rows; i += 1) dp[i][0] = i;
-  for (let j = 0; j < cols; j += 1) dp[0][j] = j;
-
-  for (let i = 1; i < rows; i += 1) {
-    for (let j = 1; j < cols; j += 1) {
-      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
-      dp[i][j] = Math.min(
-        dp[i - 1][j] + 1,
-        dp[i][j - 1] + 1,
-        dp[i - 1][j - 1] + cost
-      );
-    }
-  }
-
-  return dp[a.length][b.length];
-}
-
-function stripTokenEnding(token) {
-  let normalized = token;
-
-  TOKEN_ENDINGS.forEach((ending) => {
-    if (normalized.length > ending.length && normalized.endsWith(ending)) {
-      normalized = normalized.slice(0, -ending.length);
-    }
+  (Array.isArray(children) ? children : [children]).forEach((child) => {
+    if (child) node.append(child);
   });
-
-  return normalized;
+  return node;
 }
 
-function normalizeToken(token) {
-  return stripTokenEnding(token.toLowerCase().replace(/^[^0-9a-zA-Z가-힣]+|[^0-9a-zA-Z가-힣]+$/g, ""));
+function icon(name) {
+  return el("span", { className: "material-symbols-outlined", text: name, attrs: { "aria-hidden": "true" } });
 }
 
-function tokenizeText(text) {
-  return text
-    .split(/\s+/)
-    .map((token) => normalizeToken(token))
-    .filter(Boolean);
+function formatDate(value) {
+  const time = Date.parse(value);
+  if (Number.isNaN(time)) return "-";
+  return new Date(time).toLocaleDateString("ko-KR", { month: "long", day: "numeric", weekday: "short" });
 }
 
-function getTokenSimilarityScore(userAnswer, correctAnswer) {
-  const expectedTokens = tokenizeText(correctAnswer);
-  const userTokens = tokenizeText(userAnswer);
+function formatTimeLabel(time) {
+  if (!Core.TIME_PATTERN.test(time || "")) return time || "";
+  const [hour, minute] = time.split(":").map(Number);
+  const period = hour < 12 ? "오전" : "오후";
+  const displayHour = hour % 12 === 0 ? 12 : hour % 12;
+  return `${period} ${displayHour}:${String(minute).padStart(2, "0")}`;
+}
 
-  if (!expectedTokens.length || !userTokens.length) {
-    return { ratio: 0, exactMatchBonus: 0 };
+/** 필드 아래 오류 문구 표시 (색 + 문구 + aria) */
+function setFieldError(field, message) {
+  if (!field) return;
+  const holder = field.closest(".field, .check-row, .choice-group") || field.parentElement;
+  const id = `${field.id || field.name || "field"}-error`;
+  let error = holder.querySelector(`#${CSS.escape(id)}`);
+  if (!error) {
+    error = el("p", { className: "field-error", attrs: { id, role: "alert" } });
+    holder.appendChild(error);
   }
-
-  const usedUserTokenIndexes = new Set();
-  let matchedCount = 0;
-  let hasExactMatch = false;
-
-  expectedTokens.forEach((expectedToken) => {
-    for (let i = 0; i < userTokens.length; i += 1) {
-      if (usedUserTokenIndexes.has(i)) continue;
-
-      const userToken = userTokens[i];
-      if (userToken === expectedToken) {
-        usedUserTokenIndexes.add(i);
-        matchedCount += 1;
-        hasExactMatch = true;
-        return;
-      }
-
-      const maxLength = Math.max(expectedToken.length, userToken.length);
-      const threshold = Math.ceil(maxLength * 0.2);
-      if (levenshtein(expectedToken, userToken) <= threshold) {
-        usedUserTokenIndexes.add(i);
-        matchedCount += 1;
-        return;
-      }
-    }
-  });
-
-  return {
-    ratio: matchedCount / expectedTokens.length,
-    exactMatchBonus: hasExactMatch ? 10 : 0,
-  };
+  error.textContent = message;
+  error.hidden = false;
+  field.setAttribute("aria-invalid", "true");
+  field.setAttribute("aria-describedby", id);
+  field.classList.add("is-invalid");
 }
 
-function normalizeEnglishSentence(text) {
-  return String(text || "")
-    .toLowerCase()
-    .replace(/[^a-z0-9\s]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+function clearFieldError(field) {
+  if (!field) return;
+  const holder = field.closest(".field, .check-row, .choice-group") || field.parentElement;
+  const id = `${field.id || field.name || "field"}-error`;
+  const error = holder.querySelector(`#${CSS.escape(id)}`);
+  if (error) error.hidden = true;
+  field.removeAttribute("aria-invalid");
+  field.classList.remove("is-invalid");
 }
 
-function scoreEnglishSentence(userAnswer, correctAnswer) {
-  const normalizedUser = normalizeEnglishSentence(userAnswer);
-  const normalizedCorrect = normalizeEnglishSentence(correctAnswer);
-
-  if (!normalizedUser || !normalizedCorrect) return 0;
-  if (normalizedUser === normalizedCorrect) return 100;
-
-  const maxLength = Math.max(normalizedUser.length, normalizedCorrect.length);
-  const distance = levenshtein(normalizedUser, normalizedCorrect);
-  const similarityRatio = maxLength > 0 ? 1 - (distance / maxLength) : 0;
-  const tokenScore = getTokenSimilarityScore(normalizedUser, normalizedCorrect);
-  const totalScore = (similarityRatio * 55) + (tokenScore.ratio * 45);
-  return Math.max(0, Math.min(100, Math.round(totalScore)));
-}
-
-function updateStreak(state) {
-  const today = new Date().toDateString();
-  if (state.lastStudyDate === today) return;
-
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
-
-  if (state.lastStudyDate === yesterday.toDateString()) {
-    state.streak += 1;
-  } else {
-    state.streak = 1;
+function focusFirstInvalid(fields) {
+  const first = fields.find((field) => field && field.getAttribute("aria-invalid") === "true");
+  if (first) {
+    first.scrollIntoView({ block: "center" });
+    first.focus();
   }
-
-  state.lastStudyDate = today;
-  state.totalStudyDays += 1;
-  saveState(state);
+  return Boolean(first);
 }
 
-function scoreSentence(userAnswer, data) {
-  if (!userAnswer.trim()) return 0;
-  const keywords = Array.isArray(data.keywords) ? data.keywords : [];
-  const matchedKeywords = keywords.filter((kw) => userAnswer.includes(kw));
-  const keywordRatio = keywords.length ? matchedKeywords.length / keywords.length : 0;
-  const tokenScore = getTokenSimilarityScore(userAnswer, data.answer || "");
-  const totalScore = (keywordRatio * 40) + (tokenScore.ratio * 60) + tokenScore.exactMatchBonus;
-  return Math.min(100, Math.round(totalScore));
+function createEmptyState(message, linkText, href) {
+  const children = [el("p", { className: "empty-state-copy", text: message })];
+  if (linkText && href) {
+    children.push(el("a", { className: "btn btn-soft empty-state-link", text: linkText, attrs: { href } }));
+  }
+  return el("div", { className: "empty-state" }, children);
 }
 
-function checkVocabAnswer(userAnswer, correctMeaning) {
-  const answers = correctMeaning.split(",").map((s) => s.trim());
-  const input = userAnswer.trim();
-  if (!input) return false;
-  return answers.some((answer) => input === answer || (input.length >= 2 && answer.includes(input)));
-}
+/* ---------- 공통 ---------- */
 
 function applyDarkMode(enabled) {
-  document.body.classList.toggle("dark", enabled);
+  document.body.classList.toggle("dark", Boolean(enabled));
 }
 
-function initDarkMode(state) {
-  applyDarkMode(state.darkMode);
+function setSwitchState(element, enabled) {
+  if (!element) return;
+  element.classList.toggle("on", Boolean(enabled));
+  element.setAttribute("aria-checked", String(Boolean(enabled)));
 }
 
 function initSwitches() {
-  document.querySelectorAll('button.switch[role="switch"]').forEach((sw) => {
+  $all('button.switch[role="switch"]').forEach((sw) => {
     sw.addEventListener("click", () => {
       const isOn = sw.classList.toggle("on");
       sw.setAttribute("aria-checked", String(isOn));
       sw.dispatchEvent(new CustomEvent("switch-change", { detail: { on: isOn } }));
     });
-
-    sw.addEventListener("keydown", (event) => {
-      if (event.key === " " || event.key === "Enter") {
-        event.preventDefault();
-        sw.click();
-      }
-    });
   });
 }
 
-function initLogin() {
-  const form = $("[data-login-form]");
-  if (!form) return;
-
-  const usernameInput = $("#username") || $("#email");
-  const passwordInput = $("#password");
-
-  form.addEventListener("submit", (event) => {
-    event.preventDefault();
-
-    if (!usernameInput?.value.trim()) {
-      if (usernameInput) {
-        usernameInput.focus();
-        usernameInput.style.borderColor = "#e53935";
-      }
-      return;
-    }
-
-    if (!passwordInput?.value.trim()) {
-      if (passwordInput) {
-        passwordInput.focus();
-        passwordInput.style.borderColor = "#e53935";
-      }
-      return;
-    }
-
-    // P2: integrate Supabase Auth here.
-    if (window.mogugeo?.expandWindow) {
-      window.mogugeo.expandWindow();
-      return;
-    }
-
-    window.location.href = "dashboard.html";
-  });
-
-  [usernameInput, passwordInput].forEach((input) => {
-    if (!input) return;
-    input.addEventListener("input", () => {
-      input.style.borderColor = "";
-    });
-  });
+function initTitlebar() {
+  $("#btn-minimize")?.addEventListener("click", () => window.mogugeo?.windowMinimize?.());
+  $("#btn-maximize")?.addEventListener("click", () => window.mogugeo?.windowMaximize?.());
+  $("#btn-close")?.addEventListener("click", () => window.mogugeo?.windowClose?.());
 }
 
-function setFieldInvalid(field, firstInvalidRef) {
-  if (!field) return firstInvalidRef;
-  field.style.borderColor = "#e53935";
-  return firstInvalidRef || field;
-}
-
-function resetFieldValidation(field) {
-  if (!field) return;
-  field.style.borderColor = "";
-}
-
-function isValidSignupUsername(value) {
-  return /^[A-Za-z0-9_]{4,20}$/.test(value);
-}
-
-function isValidSignupEmail(value) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-}
-
-function isValidSignupPhone(value) {
-  return /^[0-9-]+$/.test(value);
-}
-
-function initSignup() {
-  const form = $("[data-signup-form]");
-  if (!form) return;
-
-  const usernameInput = $("#signup-username");
-  const passwordInput = $("#signup-password");
-  const passwordConfirmInput = $("#signup-password-confirm");
-  const nicknameInput = $("#signup-nickname");
-  const emailInput = $("#signup-email");
-  const phoneInput = $("#signup-phone");
-  const carrierInput = $("#signup-carrier");
-  const agreeInput = $("#signup-agree");
-
-  form.addEventListener("submit", (event) => {
-    event.preventDefault();
-    const username = usernameInput?.value.trim() || "";
-    const password = passwordInput?.value || "";
-    const passwordConfirm = passwordConfirmInput?.value || "";
-    const nickname = nicknameInput?.value.trim() || "";
-    const email = emailInput?.value.trim() || "";
-    const phone = phoneInput?.value.trim() || "";
-    let firstInvalidField = null;
-
-    [
-      usernameInput,
-      passwordInput,
-      passwordConfirmInput,
-      nicknameInput,
-      emailInput,
-      phoneInput,
-      carrierInput,
-      agreeInput,
-    ].forEach(resetFieldValidation);
-
-    if (!isValidSignupUsername(username)) {
-      firstInvalidField = setFieldInvalid(usernameInput, firstInvalidField);
-    }
-
-    if (password.length < 8) {
-      firstInvalidField = setFieldInvalid(passwordInput, firstInvalidField);
-    }
-
-    if (!passwordConfirm || passwordConfirm !== password) {
-      firstInvalidField = setFieldInvalid(passwordConfirmInput, firstInvalidField);
-    }
-
-    if (nickname.length < 2 || nickname.length > 16) {
-      firstInvalidField = setFieldInvalid(nicknameInput, firstInvalidField);
-    }
-
-    if (email && !isValidSignupEmail(email)) {
-      firstInvalidField = setFieldInvalid(emailInput, firstInvalidField);
-    }
-
-    if (phone && !isValidSignupPhone(phone)) {
-      firstInvalidField = setFieldInvalid(phoneInput, firstInvalidField);
-    }
-
-    if (!agreeInput?.checked) {
-      firstInvalidField = setFieldInvalid(agreeInput, firstInvalidField);
-    }
-
-    if (firstInvalidField) {
-      firstInvalidField.focus();
-      return;
-    }
-
-    // P2: integrate Supabase Auth here after client-side validation succeeds.
-    if (window.mogugeo?.expandWindow) {
-      window.mogugeo.expandWindow();
-      return;
-    }
-
-    window.location.href = "dashboard.html";
-  });
-
-  form.querySelectorAll(".text-input").forEach((input) => {
-    input.addEventListener("input", () => {
-      resetFieldValidation(input);
-    });
-  });
-
-  if (agreeInput) {
-    agreeInput.addEventListener("change", () => {
-      resetFieldValidation(agreeInput);
-    });
-  }
-}
-
-function initOnboarding() {
-  const stage = document.querySelector(".onboarding-stage");
-  if (!stage) return;
-
-  const steps = Array.from(document.querySelectorAll(".onboarding-step"));
-  const dots = Array.from(document.querySelectorAll(".onboarding-dot"));
-  const prevBtn = $("#onboarding-prev");
-  const nextBtn = $("#onboarding-next");
-  const startBtn = $("#onboarding-start");
-  let currentStep = 0;
-
-  function renderStep(index) {
-    currentStep = index;
-
-    steps.forEach((step, stepIndex) => {
-      const isActive = stepIndex === currentStep;
-      step.hidden = !isActive;
-      step.classList.toggle("active", isActive);
-    });
-
-    dots.forEach((dot, dotIndex) => {
-      const isActive = dotIndex === currentStep;
-      dot.classList.toggle("active", isActive);
-      dot.setAttribute("aria-current", isActive ? "step" : "false");
-    });
-
-    if (prevBtn) prevBtn.disabled = currentStep === 0;
-    if (nextBtn) nextBtn.hidden = currentStep === steps.length - 1;
-    if (startBtn) startBtn.hidden = currentStep !== steps.length - 1;
-  }
-
-  if (prevBtn) {
-    prevBtn.addEventListener("click", () => {
-      renderStep(Math.max(0, currentStep - 1));
-    });
-  }
-
-  if (nextBtn) {
-    nextBtn.addEventListener("click", () => {
-      renderStep(Math.min(steps.length - 1, currentStep + 1));
-    });
-  }
-
-  if (startBtn) {
-    startBtn.addEventListener("click", () => {
-      const state = getState();
-      state.onboardingSeen = true;
-      saveState(state);
-      window.location.href = "dashboard.html";
-    });
-  }
-
-  renderStep(0);
-}
-
-function initDashboard() {
-  if (!$("#dash-progress-text")) return;
-  const state = getState();
-  if (state.onboardingSeen === false) {
-    window.location.href = "onboarding.html";
-    return;
-  }
-  const isEmpty = hasNoStudyData(state);
-  const heroTitle = document.querySelector(".hero-title");
-  const heroCopy = document.querySelector(".hero-copy");
-  const feedbackCard = document.querySelector(".feedback-card");
-  const feedbackCopy = document.querySelector(".feedback-card .section-title");
-  const feedbackLink = document.querySelector(".feedback-card .link-action");
-  const streakGrid = document.querySelector(".streak-grid");
-
-  const totalDone = state.sentenceCorrect + state.vocabCorrect;
-  const totalGoal = 5;
-  const pct = Math.min(100, Math.round((totalDone / totalGoal) * 100));
-
-  if (heroTitle && isEmpty) {
-    heroTitle.innerHTML = "학습 기록이 없어요";
-  }
-  if (heroCopy) {
-    heroCopy.textContent = isEmpty
-      ? "첫 학습을 시작해보세요"
-      : "오늘도 한 걸음씩 목표를 채워 보세요.";
-  }
-
-  $("#dash-progress-text").textContent = isEmpty ? "0 / 5" : `${totalDone} / ${totalGoal}`;
-  const bar = $("#dash-progress-bar");
-  if (bar) bar.style.width = isEmpty ? "0%" : `${pct}%`;
-
-  const streakEl = $("#dash-streak");
-  if (streakEl) streakEl.textContent = `${isEmpty ? 0 : state.streak} days`;
-
-  const remaining = Math.max(0, totalGoal - totalDone);
-  const remainEl = $("#dash-remaining");
-  if (remainEl) {
-    remainEl.textContent = isEmpty
-      ? "아직 학습 기록이 없습니다"
-      : `${remaining} more items to reach today's goal`;
-  }
-
-  if (feedbackCard && feedbackCopy && feedbackLink && isEmpty) {
-    feedbackCopy.textContent = "학습을 시작하면 피드백이 표시됩니다.";
-    feedbackLink.href = "sentence.html";
-    feedbackLink.innerHTML = '문장 학습 시작 <span class="material-symbols-outlined">arrow_forward</span>';
-  }
-
-  if (streakGrid && isEmpty) {
-    const labels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-    streakGrid.innerHTML = labels
-      .map((label) => `<div class="streak-head">${label}</div>`)
-      .concat(Array.from({ length: 14 }, (_, index) => `<div class="streak-day pending">${index + 1}</div>`))
-      .join("");
-  }
-}
-
-function initSentence() {
-  const textEl = $("#sentence-text");
-  if (!textEl) return;
-
-  const sentences = getSentences();
-  if (!sentences.length) {
-    textEl.textContent = "Sentence data is unavailable.";
-    return;
-  }
-
-  const state = getState();
-  let idx = state.sentenceIndex % sentences.length;
-  let answered = false;
-  const reviewBtn = $("#btn-add-review");
-  const playAudioBtn = $("#btn-play-audio");
-  let currentSentence = sentences[idx];
-
-  function getSentenceContentId(data) {
-    return data.id || data.english;
-  }
-
-  function syncReviewButton(data) {
-    if (!reviewBtn) return;
-
-    const contentId = getSentenceContentId(data);
-    const isQueued = state.reviewList.some((item) => item.contentId === contentId);
-    reviewBtn.textContent = isQueued ? "Added" : "Add to review list";
-    reviewBtn.disabled = isQueued;
-  }
-
-  function loadSentence() {
-    const data = sentences[idx];
-    currentSentence = data;
-    textEl.textContent = data.english;
-    const textarea = $("#translation");
-    if (textarea) textarea.value = "";
-    answered = false;
-
-    const feedback = $("#feedback-section");
-    if (feedback) feedback.style.display = "none";
-
-    const progressText = $("#sentence-progress-text");
-    if (progressText) progressText.textContent = `${state.sentenceCorrect} / ${sentences.length} sentences`;
-
-    const progressBar = $("#sentence-progress-bar");
-    if (progressBar) {
-      progressBar.style.width = `${Math.round((state.sentenceCorrect / sentences.length) * 100)}%`;
-    }
-
-    syncReviewButton(data);
-  }
-
-  loadSentence();
-
-  const checkBtn = $("#btn-check-sentence");
-  if (checkBtn) {
-    checkBtn.addEventListener("click", () => {
-      if (answered) return;
-      const textarea = $("#translation");
-      if (!textarea || !textarea.value.trim()) {
-        if (textarea) {
-          textarea.focus();
-          textarea.style.borderColor = "#e53935";
-        }
-        return;
-      }
-
-      answered = true;
-      const data = sentences[idx];
-      const score = scoreSentence(textarea.value, data);
-
-      const feedback = $("#feedback-section");
-      if (feedback) feedback.style.display = "block";
-
-      const answerBox = feedback?.querySelector(".answer-box .section-copy");
-      if (answerBox) answerBox.textContent = data.answer;
-
-      const tipBox = feedback?.querySelector(".tip-box .section-copy");
-      if (tipBox) tipBox.textContent = data.tip;
-
-      const grammarBox = feedback?.querySelector(".explain-box > div:first-child .section-copy");
-      if (grammarBox) grammarBox.textContent = data.grammar;
-
-      const extraBox = feedback?.querySelector(".explain-box > div:last-child .section-copy");
-      if (extraBox) extraBox.textContent = data.extra;
-
-      if (score >= 60) {
-        state.sentenceCorrect += 1;
-        addToReviewQueue(getSentenceContentId(data), "sentence", state);
-        textarea.style.borderColor = "#43a047";
+function initExternalLinks() {
+  $all("[data-external]").forEach((link) => {
+    link.addEventListener("click", (event) => {
+      event.preventDefault();
+      const url = link.getAttribute("href");
+      if (window.mogugeo?.openExternal) {
+        window.mogugeo.openExternal(url);
       } else {
-        textarea.style.borderColor = "#e53935";
+        window.open(url, "_blank", "noopener");
       }
-
-      updateStreak(state);
-      saveState(state);
-      syncReviewButton(data);
     });
-  }
-
-  const nextBtn = $("#btn-next-sentence");
-  if (nextBtn) {
-    nextBtn.addEventListener("click", () => {
-      idx = (idx + 1) % sentences.length;
-      state.sentenceIndex = idx;
-      saveState(state);
-      loadSentence();
-    });
-  }
-
-  if (reviewBtn) {
-    reviewBtn.addEventListener("click", () => {
-      const data = sentences[idx];
-      if (addToReviewQueue(getSentenceContentId(data), "sentence", state)) {
-        saveState(state);
-      }
-      syncReviewButton(data);
-    });
-  }
-
-  if (playAudioBtn) {
-    playAudioBtn.addEventListener("click", () => {
-      speakText(currentSentence?.english, "en-US");
-    });
-  }
-
-  const textarea = $("#translation");
-  if (textarea) {
-    textarea.addEventListener("input", () => {
-      textarea.style.borderColor = "";
-    });
-  }
+  });
 }
 
-function initVocabulary() {
-  const wordEl = $("#vocab-word");
-  if (!wordEl) return;
-
-  const words = getWords();
-  if (!words.length) {
-    wordEl.textContent = "Vocabulary data is unavailable.";
-    return;
-  }
-
+function logout() {
   const state = getState();
-  let idx = state.vocabIndex % words.length;
-  let answered = false;
-
-  function loadWord() {
-    const data = words[idx];
-    wordEl.textContent = data.word;
-    const input = $("#vocab-answer");
-    if (input) input.value = "";
-    answered = false;
-
-    const result = $("#vocab-result");
-    if (result) result.style.display = "none";
-
-    const panel = $("#vocab-info-panel");
-    if (panel) panel.style.visibility = "hidden";
-
-    const total = state.vocabIndex;
-    const correct = state.vocabCorrect;
-
-    const progress = $("#vocab-progress");
-    if (progress) progress.textContent = `${total} / ${words.length} words`;
-
-    const bar = $("#vocab-progress-bar");
-    if (bar) bar.style.width = `${Math.round((total / words.length) * 100)}%`;
-
-    const accuracy = $("#vocab-accuracy");
-    if (accuracy) {
-      const pct = total > 0 ? Math.round((correct / total) * 100) : 0;
-      accuracy.textContent = `Accuracy ${pct}%`;
-    }
-  }
-
-  loadWord();
-
-  const checkBtn = $("#vocab-check");
-  if (checkBtn) {
-    checkBtn.addEventListener("click", () => {
-      if (answered) return;
-      const input = $("#vocab-answer");
-      if (!input || !input.value.trim()) {
-        if (input) {
-          input.focus();
-          input.style.borderColor = "#e53935";
-        }
-        return;
-      }
-
-      answered = true;
-      const data = words[idx];
-      const isCorrect = checkVocabAnswer(input.value, data.meaning);
-
-      if (isCorrect) {
-        state.vocabCorrect += 1;
-        input.style.borderColor = "#43a047";
-      } else {
-        input.style.borderColor = "#e53935";
-      }
-
-      const result = $("#vocab-result");
-      if (result) {
-        result.style.display = "block";
-        result.style.padding = "12px 16px";
-        result.style.borderRadius = "8px";
-        result.style.fontWeight = "600";
-        if (isCorrect) {
-          result.textContent = "Correct";
-          result.className = "spacer-top vocab-result-correct";
-        } else {
-          result.textContent = `Not quite. Meaning: ${data.meaning}`;
-          result.className = "spacer-top vocab-result-wrong";
-        }
-      }
-
-      const panel = $("#vocab-info-panel");
-      if (panel) panel.style.visibility = "visible";
-
-      $("#vocab-pron").textContent = data.pronunciation;
-      $("#vocab-example").textContent = data.example;
-      $("#vocab-meaning").textContent = data.meaning;
-      $("#vocab-related").textContent = data.related;
-
-      const nextTotal = state.vocabIndex + 1;
-      const progress = $("#vocab-progress");
-      if (progress) progress.textContent = `${nextTotal} / ${words.length} words`;
-
-      const bar = $("#vocab-progress-bar");
-      if (bar) bar.style.width = `${Math.round((nextTotal / words.length) * 100)}%`;
-
-      const accuracy = $("#vocab-accuracy");
-      if (accuracy) {
-        accuracy.textContent = `Accuracy ${Math.round((state.vocabCorrect / nextTotal) * 100)}%`;
-      }
-
-      updateStreak(state);
-      saveState(state);
-    });
-  }
-
-  const nextBtn = $("#vocab-next");
-  if (nextBtn) {
-    nextBtn.addEventListener("click", () => {
-      idx = (idx + 1) % words.length;
-      state.vocabIndex = idx;
-      saveState(state);
-      loadWord();
-    });
-  }
-
-  const input = $("#vocab-answer");
-  if (input) {
-    input.addEventListener("input", () => {
-      input.style.borderColor = "";
-    });
-    input.addEventListener("keydown", (event) => {
-      if (event.key === "Enter") {
-        event.preventDefault();
-        if (!answered && checkBtn) checkBtn.click();
-      }
-    });
-  }
-}
-
-function initExpressions() {
-  const grid = $("#expressions-grid");
-  if (!grid) return;
-
-  const expressions = getExpressions();
-  if (!expressions.length) {
-    grid.innerHTML = '<div class="list-item"><div><strong>No data</strong><p class="small muted">Expressions data is unavailable.</p></div></div>';
-    return;
-  }
-
-  grid.innerHTML = expressions
-    .map(
-      (item) => `
-        <div class="list-item" style="align-items: flex-start;">
-          <div>
-            <strong>${item.expression}</strong>
-            <p class="small muted">${item.korean}</p>
-            <p class="small muted">${item.example}</p>
-            <p class="small muted">${item.context}</p>
-            <p class="small muted">${item.note}</p>
-          </div>
-          <span class="chip">${item.category}</span>
-        </div>
-      `,
-    )
-    .join("");
-}
-
-function initMyPage() {
-  const nameEl = $("#profile-name");
-  if (!nameEl) return;
-
-  const state = getState();
-  const isEmpty = hasNoStudyData(state);
-
-  const daysEl = $("#total-days");
-  if (daysEl) daysEl.textContent = `Total study days ${state.totalStudyDays}`;
-
-  const streakEl = $("#streak-chip");
-  if (streakEl) streakEl.textContent = `${state.streak} day streak`;
-
-  if (isEmpty) {
-    const chartArea = document.querySelector(".chart-area");
-    const heatmap = document.querySelector(".heatmap");
-
-    if (chartArea) {
-      chartArea.replaceChildren(
-        createEmptyState("아직 학습 데이터가 없습니다. 첫 학습을 시작해보세요")
-      );
-    }
-
-    if (heatmap) {
-      heatmap.replaceChildren(
-        createEmptyState("아직 학습 데이터가 없습니다. 첫 학습을 시작해보세요")
-      );
-    }
-  }
-
-  const darkToggle = $("#dark-mode-toggle");
-  if (darkToggle) {
-    if (state.darkMode) {
-      darkToggle.classList.add("on");
-      darkToggle.setAttribute("aria-checked", "true");
-    }
-    darkToggle.addEventListener("switch-change", (event) => {
-      state.darkMode = event.detail.on;
-      applyDarkMode(state.darkMode);
-      saveState(state);
-    });
-  }
-
-  initReviewNote();
-}
-
-function initReviewNote() {
-  const container = $("#review-list-container");
-  if (!container) return;
-
-  const countEl = $("#review-list-count");
-  const state = getState();
-  const sentenceMap = new Map(
-    getSentences().map((sentence) => [sentence.id || sentence.english, sentence])
-  );
-
-  function formatReviewDate(isoDate) {
-    const time = Date.parse(isoDate);
-    if (Number.isNaN(time)) return "날짜 정보 없음";
-    return new Date(time).toLocaleDateString("ko-KR");
-  }
-
-  function render() {
-    const dueItems = getDueReviewItems(state);
-
-    if (countEl) {
-      countEl.textContent = `대기 중 ${dueItems.length}개`;
-    }
-
-    container.replaceChildren();
-
-    if (!dueItems.length) {
-      const empty = document.createElement("p");
-      empty.className = "muted";
-      empty.textContent = "복습할 항목이 없습니다";
-      container.appendChild(empty);
-      return;
-    }
-
-    const list = document.createElement("div");
-    list.className = "list-stack";
-
-    dueItems.forEach((item) => {
-      const row = document.createElement("div");
-      row.className = "list-item";
-
-      const content = document.createElement("div");
-      content.style.flex = "1";
-      content.style.minWidth = "0";
-
-      const sentence = sentenceMap.get(item.contentId);
-      const title = document.createElement("strong");
-      title.textContent = sentence?.english || item.contentId;
-
-      const meta = document.createElement("p");
-      meta.className = "fine-copy small";
-      meta.style.margin = "8px 0 0";
-      meta.textContent = `다음 복습 ${formatReviewDate(item.nextReviewAt)}`;
-
-      const removeBtn = document.createElement("button");
-      removeBtn.type = "button";
-      removeBtn.className = "link-action";
-      removeBtn.textContent = "지우기";
-      removeBtn.addEventListener("click", () => {
-        state.reviewList = state.reviewList.filter((reviewItem) => reviewItem.contentId !== item.contentId);
-        saveState(state);
-        render();
-      });
-
-      content.append(title, meta);
-      row.append(content, removeBtn);
-      list.appendChild(row);
-    });
-
-    container.appendChild(list);
-  }
-
-  render();
-}
-
-function setSwitchState(element, enabled) {
-  if (!element) return;
-  element.classList.toggle("on", enabled);
-  element.setAttribute("aria-checked", String(enabled));
-}
-
-async function syncDailyPopupSetting(state) {
-  await window.mogugeo?.setDailyPopup?.(
-    state.settings.dailyPopupEnabled,
-    state.settings.popupTime,
-  );
-}
-
-async function syncAutoStartSetting(state) {
-  await window.mogugeo?.setAutoStart?.(state.settings.autoStart);
-}
-
-async function initSettings() {
-  const timeInput = $("#popup-time");
-  if (!timeInput) return;
-
-  const state = getState();
-  const diffSelect = $("#difficulty");
-  const typeSelect = $("#learning-type");
-  const dailyPopupToggle = $("#daily-popup-toggle");
-  const autoStartToggle = $("#auto-start-toggle");
-  const autoLoginToggle = $("#auto-login-toggle");
-  const darkToggle = $("#dark-mode-toggle");
-  const reportIssueButton = $("#btn-report-issue");
-
-  try {
-    const autoStartEnabled = await window.mogugeo?.getAutoStart?.();
-    if (typeof autoStartEnabled === "boolean") {
-      state.settings.autoStart = autoStartEnabled;
-    }
-
-    const dailyPopup = await window.mogugeo?.getDailyPopup?.();
-    if (typeof dailyPopup?.enabled === "boolean") {
-      state.settings.dailyPopupEnabled = dailyPopup.enabled;
-    }
-    if (typeof dailyPopup?.time === "string" && dailyPopup.time.trim()) {
-      state.settings.popupTime = dailyPopup.time;
-    }
-  } catch (error) {
-    console.warn("Failed to sync settings state from the OS.", error);
-  }
-
-  timeInput.value = state.settings.popupTime;
-  if (diffSelect) diffSelect.value = state.settings.difficulty;
-  if (typeSelect) typeSelect.value = state.settings.learningType;
-  setSwitchState(dailyPopupToggle, state.settings.dailyPopupEnabled);
-  setSwitchState(autoStartToggle, state.settings.autoStart);
-  setSwitchState(autoLoginToggle, state.settings.autoLogin);
-  setSwitchState(darkToggle, state.darkMode);
+  state.signedOut = true;
   saveState(state);
-
-  [timeInput, diffSelect, typeSelect].forEach((element) => {
-    if (!element) return;
-    element.addEventListener("change", async () => {
-      state.settings.popupTime = timeInput.value;
-      if (diffSelect) state.settings.difficulty = diffSelect.value;
-      if (typeSelect) state.settings.learningType = typeSelect.value;
-      saveState(state);
-      await syncDailyPopupSetting(state);
-    });
-  });
-
-  if (dailyPopupToggle) {
-    dailyPopupToggle.addEventListener("switch-change", async (event) => {
-      state.settings.dailyPopupEnabled = event.detail.on;
-      saveState(state);
-      await syncDailyPopupSetting(state);
-    });
-  }
-
-  if (autoStartToggle) {
-    autoStartToggle.addEventListener("switch-change", async (event) => {
-      state.settings.autoStart = event.detail.on;
-      saveState(state);
-      await syncAutoStartSetting(state);
-    });
-  }
-
-  if (autoLoginToggle) {
-    autoLoginToggle.addEventListener("switch-change", (event) => {
-      state.settings.autoLogin = event.detail.on;
-      saveState(state);
-    });
-  }
-
-  if (darkToggle) {
-    darkToggle.addEventListener("switch-change", (event) => {
-      state.darkMode = event.detail.on;
-      applyDarkMode(state.darkMode);
-      saveState(state);
-    });
-  }
-
-  if (reportIssueButton) {
-    reportIssueButton.addEventListener("click", () => {
-      window.mogugeo?.openExternal?.("https://github.com/BrandonLotusKim/MoGugeo/issues");
-      // Replace with the actual repo URL if the Issues path changes.
-    });
-  }
-}
-
-function recordStudyLog(state, entry) {
-  getStudyLog(state).push(entry);
-}
-
-function syncPopupReviewState(state, contentId, isCorrect) {
-  if (!contentId) return;
-
-  const hasExistingItem = state.reviewList.some((item) => item.contentId === contentId);
-  if (hasExistingItem) {
-    updateReviewItem(contentId, isCorrect, state);
+  if (window.mogugeo?.shrinkWindow) {
+    window.mogugeo.shrinkWindow();
     return;
   }
-
-  addToReviewQueue(contentId, "sentence", state);
-}
-
-function initPopup() {
-  const checkBtn = $("#popup-check");
-  if (!checkBtn) return;
-
-  const state = getState();
-  const heroCopy = $("#popup-hero-copy");
-  const messageEl = $("#popup-message");
-  const resultEl = $("#popup-result");
-  const taskStack = $("#popup-task-stack");
-  const taskOne = $("#popup-task-1");
-  const taskTwo = $("#popup-task-2");
-  const questionOne = $("#popup-question-1");
-  const questionTwo = $("#popup-question-2");
-  const inputOne = $("#popup-answer-1");
-  const inputTwo = $("#popup-answer-2");
-  const today = new Date().toDateString();
-
-  function setPopupMessage(message, color) {
-    if (!messageEl) return;
-    messageEl.textContent = message;
-    messageEl.style.color = color || "";
-  }
-
-  function disablePopupForm(message) {
-    [inputOne, inputTwo].forEach((input) => {
-      if (!input) return;
-      input.disabled = true;
-    });
-    checkBtn.disabled = true;
-    checkBtn.style.opacity = "0.6";
-    if (message) setPopupMessage(message);
-  }
-
-  if (state.lastPopupDate === today) {
-    if (heroCopy) heroCopy.textContent = "Today's popup study is already complete.";
-    if (taskStack) taskStack.style.display = "none";
-    if (resultEl) resultEl.hidden = true;
-    disablePopupForm("Come back tomorrow for a new popup set.");
-    return;
-  }
-
-  const popupSentences = pickPopupSentences(state);
-  const taskConfigs = [
-    {
-      sentence: popupSentences[0],
-      input: inputOne,
-      card: taskOne,
-      question: questionOne,
-      direction: "en-to-ko",
-    },
-    {
-      sentence: popupSentences[1],
-      input: inputTwo,
-      card: taskTwo,
-      question: questionTwo,
-      direction: "ko-to-en",
-    },
-  ];
-  const activeTasks = taskConfigs.filter((task) => task.sentence);
-
-  if (!activeTasks.length) {
-    if (heroCopy) heroCopy.textContent = "Sentence data is unavailable.";
-    if (taskStack) taskStack.style.display = "none";
-    disablePopupForm("Unable to load popup questions.");
-    return;
-  }
-
-  taskConfigs.forEach((task) => {
-    if (!task.card) return;
-
-    if (!task.sentence) {
-      task.card.style.display = "none";
-      return;
-    }
-
-    task.card.style.display = "";
-    if (task.question) {
-      task.question.textContent = task.direction === "en-to-ko"
-        ? task.sentence.english
-        : (task.sentence.answer || "");
-    }
-
-    if (task.input) {
-      task.input.value = "";
-      task.input.disabled = false;
-      task.input.style.borderColor = "";
-      task.input.placeholder = task.direction === "en-to-ko"
-        ? "Enter the Korean meaning."
-        : "Enter the English sentence.";
-    }
-  });
-
-  checkBtn.addEventListener("click", () => {
-    let allFilled = true;
-
-    activeTasks.forEach((task) => {
-      if (task.input && !task.input.value.trim()) {
-        task.input.style.borderColor = "#e53935";
-        allFilled = false;
-      }
-    });
-
-    if (!allFilled) {
-      setPopupMessage("Fill in every visible answer before grading.", "#e53935");
-      return;
-    }
-
-    const completedAt = new Date().toISOString();
-    const resultItems = [];
-
-    activeTasks.forEach((task, index) => {
-      const score = task.direction === "en-to-ko"
-        ? scoreSentence(task.input.value, task.sentence)
-        : scoreEnglishSentence(task.input.value, task.sentence.english);
-      const isCorrect = score >= 60;
-      const contentId = getSentenceContentId(task.sentence);
-      const correctAnswer = task.direction === "en-to-ko" ? task.sentence.answer : task.sentence.english;
-
-      task.input.style.borderColor = isCorrect ? "#43a047" : "#e53935";
-      recordStudyLog(state, {
-        date: completedAt,
-        contentId,
-        direction: task.direction,
-        score,
-        isCorrect,
-      });
-      syncPopupReviewState(state, contentId, isCorrect);
-
-      resultItems.push({
-        index,
-        score,
-        isCorrect,
-        correctAnswer,
-      });
-    });
-
-    resultItems.forEach((item) => {
-      const statusEl = $(`#popup-result-${item.index + 1}-status`);
-      const answerEl = $(`#popup-result-${item.index + 1}-answer`);
-      const scoreEl = $(`#popup-result-${item.index + 1}-score`);
-      const rowEl = $(`#popup-result-item-${item.index + 1}`);
-
-      if (rowEl) rowEl.style.display = "";
-      if (statusEl) {
-        statusEl.textContent = item.isCorrect
-          ? `Task ${item.index + 1}: Correct`
-          : `Task ${item.index + 1}: Review needed`;
-      }
-      if (answerEl) {
-        answerEl.textContent = `Model answer: ${item.correctAnswer || "N/A"}`;
-      }
-      if (scoreEl) {
-        scoreEl.textContent = `${item.score}`;
-      }
-    });
-
-    if (resultEl) {
-      resultEl.hidden = false;
-    }
-
-    if (activeTasks.length < taskConfigs.length) {
-      const hiddenResultRow = $("#popup-result-item-2");
-      if (hiddenResultRow && activeTasks.length === 1) {
-        hiddenResultRow.style.display = "none";
-      }
-    }
-
-    state.lastPopupDate = today;
-    updateStreak(state);
-    saveState(state);
-
-    checkBtn.textContent = "Done";
-    checkBtn.disabled = true;
-    checkBtn.style.opacity = "0.6";
-    activeTasks.forEach((task) => {
-      if (task.input) task.input.disabled = true;
-    });
-    if (heroCopy) heroCopy.textContent = "Today's popup study is complete.";
-    setPopupMessage("Results saved. Review items and streak have been updated.", "#43a047");
-  });
-
-  [inputOne, inputTwo].forEach((input) => {
-    if (!input) return;
-    input.addEventListener("input", () => {
-      input.style.borderColor = "";
-      setPopupMessage("");
-    });
-    input.addEventListener("keydown", (event) => {
-      if (event.key === "Enter") {
-        event.preventDefault();
-        if (!checkBtn.disabled) checkBtn.click();
-      }
-    });
-  });
-}
-
-function initDemoActions() {
-  document.querySelectorAll("[data-demo-action]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      window.alert("This demo action is not implemented yet.");
-    });
-  });
+  window.location.href = "main.html";
 }
 
 function initSlideMenu() {
@@ -1551,67 +183,1008 @@ function initSlideMenu() {
   const btnClose = $("#btn-menu-close");
   const overlay = $("#menu-overlay");
   const menu = $("#slide-menu");
-  if (!btnOpen || !menu) return;
 
-  function openMenu() {
-    menu.classList.add("open");
-    if (overlay) overlay.classList.add("open");
+  if (btnOpen && menu) {
+    const openMenu = () => {
+      menu.classList.add("open");
+      overlay?.classList.add("open");
+      btnOpen.setAttribute("aria-expanded", "true");
+      $("a, button", menu)?.focus();
+    };
+    const closeMenu = () => {
+      menu.classList.remove("open");
+      overlay?.classList.remove("open");
+      btnOpen.setAttribute("aria-expanded", "false");
+    };
+    btnOpen.addEventListener("click", openMenu);
+    btnClose?.addEventListener("click", closeMenu);
+    overlay?.addEventListener("click", closeMenu);
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && menu.classList.contains("open")) closeMenu();
+    });
   }
 
-  function closeMenu() {
-    menu.classList.remove("open");
-    if (overlay) overlay.classList.remove("open");
-  }
-
-  btnOpen.addEventListener("click", openMenu);
-  if (btnClose) btnClose.addEventListener("click", closeMenu);
-  if (overlay) overlay.addEventListener("click", closeMenu);
-
-  document.querySelectorAll("#btn-logout, [data-logout-link]").forEach((btnLogout) => {
-    btnLogout.addEventListener("click", (event) => {
+  $all("[data-logout]").forEach((button) => {
+    button.addEventListener("click", (event) => {
       event.preventDefault();
-      if (window.mogugeo?.shrinkWindow) {
-        window.mogugeo.shrinkWindow();
-        return;
-      }
-
-      window.location.href = "main.html";
+      logout();
     });
   });
 }
 
-function initTitlebar() {
-  const btnMin = $("#btn-minimize");
-  const btnMax = $("#btn-maximize");
-  const btnClose = $("#btn-close");
-  if (!btnMin && !btnMax && !btnClose) return;
+/** 사이드바·상단의 닉네임 표시 */
+function renderProfileName(state) {
+  $all("[data-profile-name]").forEach((node) => {
+    node.textContent = getNickname(state);
+  });
+}
 
-  if (btnMin) {
-    btnMin.addEventListener("click", () => {
-      if (window.mogugeo?.windowMinimize) window.mogugeo.windowMinimize();
+/**
+ * 앱을 켤 때 한 번, 저장된 설정을 OS(작업 스케줄러·시작 프로그램)에 반영한다.
+ * 실제 반영은 패키지 설치본에서만 일어나고, 개발 모드에서는 메인 프로세스가 무시한다.
+ */
+async function syncOsSettingsOnce(state) {
+  try {
+    if (sessionStorage.getItem(OS_SYNC_KEY)) return;
+    sessionStorage.setItem(OS_SYNC_KEY, "1");
+  } catch {
+    return;
+  }
+  try {
+    await window.mogugeo?.setDailyPopup?.(state.settings.dailyPopupEnabled, state.settings.popupTime);
+    await window.mogugeo?.setAutoStart?.(state.settings.autoStart);
+  } catch (error) {
+    console.warn("OS 설정 동기화 실패", error);
+  }
+}
+
+function requireProfile(state) {
+  if (state.profile) return true;
+  if (window.mogugeo?.shrinkWindow) {
+    window.mogugeo.shrinkWindow();
+  } else {
+    window.location.href = "main.html";
+  }
+  return false;
+}
+
+/* ---------- 로그인 (로컬 프로필 선택) ---------- */
+
+function enterApp() {
+  if (window.mogugeo?.expandWindow) {
+    window.mogugeo.expandWindow();
+    return;
+  }
+  window.location.href = "dashboard.html";
+}
+
+function initLogin() {
+  const root = $("[data-login]");
+  if (!root) return;
+
+  const state = getState();
+  const profileView = $("#login-profile");
+  const emptyView = $("#login-empty");
+
+  if (!state.profile) {
+    if (profileView) profileView.hidden = true;
+    if (emptyView) emptyView.hidden = false;
+    const migratedNote = $("#login-existing-data");
+    if (migratedNote) migratedNote.hidden = state.studyLog.length === 0;
+    return;
+  }
+
+  if (emptyView) emptyView.hidden = true;
+  if (profileView) profileView.hidden = false;
+
+  $("#login-avatar").textContent = state.profile.nickname.slice(0, 1).toUpperCase();
+  $("#login-nickname").textContent = state.profile.nickname;
+  $("#login-meta").textContent = `${Core.getDifficultyLabel(state.settings.difficulty)} · 학습 ${Core.countStudyDays(state.studyLog)}일`;
+
+  const autoLogin = $("#login-auto");
+  if (autoLogin) {
+    autoLogin.checked = state.settings.autoLogin;
+    autoLogin.addEventListener("change", () => {
+      const latest = getState();
+      latest.settings.autoLogin = autoLogin.checked;
+      saveState(latest);
     });
   }
 
-  if (btnMax) {
-    btnMax.addEventListener("click", () => {
-      if (window.mogugeo?.windowMaximize) window.mogugeo.windowMaximize();
-    });
+  $("#btn-login-start")?.addEventListener("click", () => {
+    const latest = getState();
+    latest.signedOut = false;
+    saveState(latest);
+    enterApp();
+  });
+
+  // 자동 로그인: 직접 로그아웃하지 않았다면 바로 대시보드로
+  if (state.settings.autoLogin && !state.signedOut) {
+    enterApp();
+  }
+}
+
+/* ---------- 프로필 만들기 ---------- */
+
+function initSignup() {
+  const form = $("[data-signup-form]");
+  if (!form) return;
+
+  const state = getState();
+  const nicknameInput = $("#signup-nickname");
+  const agreeInput = $("#signup-agree");
+  const difficultyInputs = $all('input[name="difficulty"]', form);
+  const difficultyGroup = $("#signup-difficulty");
+
+  const current = state.settings.difficulty;
+  difficultyInputs.forEach((input) => {
+    input.checked = input.value === current;
+  });
+
+  if (state.profile) {
+    const notice = $("#signup-replace-notice");
+    if (notice) {
+      notice.hidden = false;
+      notice.textContent = `이미 "${state.profile.nickname}" 프로필이 있습니다. 새로 만들면 닉네임과 난이도만 바뀌고 학습 기록은 그대로 남습니다.`;
+    }
+    nicknameInput.value = state.profile.nickname;
   }
 
-  if (btnClose) {
-    btnClose.addEventListener("click", () => {
-      if (window.mogugeo?.windowClose) window.mogugeo.windowClose();
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    [nicknameInput, agreeInput].forEach(clearFieldError);
+    if (difficultyGroup) clearFieldError(difficultyGroup);
+
+    const nicknameError = Core.validateNickname(nicknameInput.value);
+    if (nicknameError) setFieldError(nicknameInput, nicknameError);
+
+    const selected = difficultyInputs.find((input) => input.checked);
+    if (!selected && difficultyGroup) setFieldError(difficultyGroup, "난이도를 하나 고르세요.");
+
+    if (!agreeInput.checked) setFieldError(agreeInput, "이용약관과 개인정보 처리방침에 동의해야 시작할 수 있습니다.");
+
+    if (focusFirstInvalid([nicknameInput, difficultyGroup, agreeInput])) return;
+
+    const latest = getState();
+    Core.createProfile(latest, {
+      nickname: nicknameInput.value,
+      difficulty: selected.value,
+      now: new Date(),
+    });
+    saveState(latest);
+    enterApp();
+  });
+
+  nicknameInput.addEventListener("input", () => clearFieldError(nicknameInput));
+  agreeInput.addEventListener("change", () => clearFieldError(agreeInput));
+  difficultyInputs.forEach((input) => input.addEventListener("change", () => clearFieldError(difficultyGroup)));
+}
+
+/* ---------- 온보딩 ---------- */
+
+function initOnboarding() {
+  const stage = $(".onboarding-stage");
+  if (!stage) return;
+
+  const state = getState();
+  if (!requireProfile(state)) return;
+
+  const steps = $all(".onboarding-step");
+  const dots = $all(".onboarding-dot");
+  const prevBtn = $("#onboarding-prev");
+  const nextBtn = $("#onboarding-next");
+  const startBtn = $("#onboarding-start");
+  const timeInput = $("#onboarding-popup-time");
+  const popupToggle = $("#onboarding-popup-toggle");
+  let currentStep = 0;
+
+  if (timeInput) timeInput.value = state.settings.popupTime;
+  if (popupToggle) popupToggle.checked = state.settings.dailyPopupEnabled;
+  const levelLabel = $("#onboarding-level");
+  if (levelLabel) levelLabel.textContent = Core.getDifficultyLabel(state.settings.difficulty);
+
+  function renderStep(index) {
+    currentStep = index;
+    steps.forEach((step, stepIndex) => {
+      const isActive = stepIndex === currentStep;
+      step.hidden = !isActive;
+      step.classList.toggle("active", isActive);
+    });
+    dots.forEach((dot, dotIndex) => {
+      const isActive = dotIndex === currentStep;
+      dot.classList.toggle("active", isActive);
+      if (isActive) dot.setAttribute("aria-current", "step");
+      else dot.removeAttribute("aria-current");
+    });
+    if (prevBtn) prevBtn.disabled = currentStep === 0;
+    if (nextBtn) nextBtn.hidden = currentStep === steps.length - 1;
+    if (startBtn) startBtn.hidden = currentStep !== steps.length - 1;
+  }
+
+  prevBtn?.addEventListener("click", () => renderStep(Math.max(0, currentStep - 1)));
+  nextBtn?.addEventListener("click", () => renderStep(Math.min(steps.length - 1, currentStep + 1)));
+  dots.forEach((dot, index) => dot.addEventListener("click", () => renderStep(index)));
+
+  startBtn?.addEventListener("click", async () => {
+    const latest = getState();
+    if (timeInput && Core.TIME_PATTERN.test(timeInput.value)) latest.settings.popupTime = timeInput.value;
+    if (popupToggle) latest.settings.dailyPopupEnabled = popupToggle.checked;
+    latest.onboardingSeen = true;
+    saveState(latest);
+    try {
+      await window.mogugeo?.setDailyPopup?.(latest.settings.dailyPopupEnabled, latest.settings.popupTime);
+    } catch (error) {
+      console.warn("데일리 팝업 설정 반영 실패", error);
+    }
+    window.location.href = "dashboard.html";
+  });
+
+  renderStep(0);
+}
+
+/* ---------- 대시보드 ---------- */
+
+function initDashboard() {
+  if (!$("#dash-progress-text")) return;
+  const state = getState();
+  if (!requireProfile(state)) return;
+  if (!state.onboardingSeen) {
+    window.location.href = "onboarding.html";
+    return;
+  }
+  syncOsSettingsOnce(state);
+
+  const now = new Date();
+  const today = Core.getTodaySummary(state.studyLog, now);
+  const streak = Core.computeStreak(state.studyLog, now);
+  const dueCount = Core.getDueReviewItems(state, now).length;
+  const hour = now.getHours();
+  const greeting = hour < 12 ? "좋은 아침입니다" : hour < 18 ? "좋은 오후입니다" : "좋은 저녁입니다";
+
+  $("#dash-greeting").textContent = `${greeting}, ${getNickname(state)}님.`;
+  $("#dash-hero-copy").textContent = state.studyLog.length === 0
+    ? "아직 학습 기록이 없습니다. 첫 문장을 풀어 보세요."
+    : today.total >= today.goal
+      ? `오늘 목표 ${today.goal}문장을 채웠습니다. 복습까지 마치면 더 좋습니다.`
+      : `오늘 ${today.total}문장을 풀었습니다. 목표까지 ${today.goal - today.total}문장 남았습니다.`;
+
+  $("#dash-progress-text").textContent = `${today.total} / ${today.goal}`;
+  $("#dash-progress-bar").style.width = `${today.percent}%`;
+  const progressbar = $("#dash-progress");
+  if (progressbar) progressbar.setAttribute("aria-valuenow", String(today.total));
+  $("#dash-remaining").textContent = today.total
+    ? `오늘 정답 ${today.correct}개 · 난이도 ${Core.getDifficultyLabel(state.settings.difficulty)}`
+    : `난이도 ${Core.getDifficultyLabel(state.settings.difficulty)} · 오늘 아직 풀지 않았습니다`;
+
+  $("#dash-streak").textContent = `${streak}일 연속`;
+
+  const reviewBtn = $("#dash-review-btn");
+  const reviewCopy = $("#dash-review-copy");
+  if (reviewBtn) {
+    if (dueCount > 0) {
+      reviewBtn.removeAttribute("aria-disabled");
+      reviewBtn.classList.remove("is-disabled");
+      reviewBtn.setAttribute("href", "sentence.html?mode=review");
+      reviewBtn.textContent = `복습 ${dueCount}개 시작`;
+    } else {
+      reviewBtn.setAttribute("aria-disabled", "true");
+      reviewBtn.classList.add("is-disabled");
+      reviewBtn.removeAttribute("href");
+      reviewBtn.textContent = "오늘 복습 없음";
+    }
+  }
+  if (reviewCopy) {
+    reviewCopy.textContent = dueCount > 0
+      ? `틀렸던 문장 ${dueCount}개가 오늘 다시 볼 차례입니다.`
+      : `복습 노트 ${state.reviewList.length}개 · 오늘 도래한 항목은 없습니다.`;
+  }
+
+  renderLatestEntry(state);
+  renderStreakCalendar(state, now);
+}
+
+function renderLatestEntry(state) {
+  const box = $("#dash-latest");
+  if (!box) return;
+  const latest = Core.getLatestEntry(state.studyLog);
+  box.replaceChildren();
+  if (!latest) {
+    box.append(createEmptyState("문장을 풀면 가장 최근 결과가 여기에 표시됩니다.", "문장 학습 시작", "sentence.html"));
+    return;
+  }
+  const sentence = getSentenceMap().get(latest.contentId);
+  const badge = el("span", {
+    className: `result-badge ${latest.isCorrect ? "pass" : "fail"}`,
+  }, [icon(latest.isCorrect ? "check_circle" : "cancel"), el("span", { text: latest.isCorrect ? "정답" : "오답" })]);
+  box.append(
+    el("div", { className: "latest-head" }, [badge, el("span", { className: "latest-score", text: `${latest.score}점` })]),
+    el("p", { className: "latest-sentence", text: sentence?.english || latest.contentId }),
+    el("p", {
+      className: "fine-copy small",
+      text: `${formatDate(latest.date)} · ${latest.direction === "ko-to-en" ? "한→영 작문" : "영→한 해석"} · ${latest.source === "popup" ? "데일리 팝업" : latest.source === "review" ? "복습" : "문장 학습"}`,
+    }),
+    el("a", { className: "link-action", attrs: { href: "mypage.html" } }, [el("span", { text: "학업 성취도 보기" }), icon("arrow_forward")]),
+  );
+}
+
+function renderStreakCalendar(state, now) {
+  const grid = $(".streak-grid");
+  if (!grid) return;
+  const heads = ["월", "화", "수", "목", "금", "토", "일"].map((label) => el("div", { className: "streak-head", text: label }));
+  const statusText = { active: "학습함", current: "오늘", pending: "예정", missed: "학습 안 함" };
+  const cells = Core.getStreakCalendar(state.studyLog, now).map((cell) => el("div", {
+    className: `streak-day ${cell.status}${cell.isToday ? " today" : ""}`,
+    text: String(cell.day),
+    attrs: { title: `${cell.key} ${statusText[cell.status]}`, "aria-label": `${cell.key} ${statusText[cell.status]}` },
+  }));
+  grid.replaceChildren(...heads, ...cells);
+}
+
+/* ---------- 문장 학습 / 복습 ---------- */
+
+function initSentence() {
+  const textEl = $("#sentence-text");
+  if (!textEl) return;
+
+  const state = getState();
+  if (!requireProfile(state)) return;
+
+  const sentences = getSentences();
+  const params = new URLSearchParams(window.location.search);
+  let mode = params.get("mode") === "review" ? "review" : "new";
+  let repeat = false;
+  const answeredThisSession = new Set();
+  let current = null;
+  let answered = false;
+
+  const card = $("#sentence-card");
+  const exhausted = $("#sentence-exhausted");
+  const textarea = $("#translation");
+  const checkBtn = $("#btn-check-sentence");
+  const nextBtn = $("#btn-next-sentence");
+  const reviewBtn = $("#btn-add-review");
+  const feedback = $("#feedback-section");
+  const modeChip = $("#sentence-mode");
+
+  function renderProgress() {
+    const today = Core.getTodaySummary(state.studyLog, new Date());
+    $("#sentence-progress-text").textContent = `오늘 ${today.total} / ${today.goal}문장`;
+    $("#sentence-progress-bar").style.width = `${today.percent}%`;
+  }
+
+  function syncReviewButton() {
+    if (!reviewBtn || !current) return;
+    const queued = Boolean(Core.findReviewItem(state, Core.getSentenceId(current)));
+    reviewBtn.textContent = queued ? "복습 노트에 있음" : "복습 노트에 추가";
+    reviewBtn.disabled = queued;
+  }
+
+  function pick() {
+    const now = new Date();
+    if (mode === "review") {
+      return Core.getDueSentences(state, sentences, now)
+        .find((sentence) => !answeredThisSession.has(Core.getSentenceId(sentence))) || null;
+    }
+    if (repeat) return Core.pickRepeatSentence(state, sentences, answeredThisSession);
+    return Core.pickNextNewSentence(state, sentences, answeredThisSession);
+  }
+
+  function showExhausted() {
+    current = null;
+    card.hidden = true;
+    feedback.hidden = true;
+    reviewBtn.hidden = true;
+    nextBtn.hidden = true;
+    exhausted.hidden = false;
+    const dueCount = Core.getDueReviewItems(state, new Date()).length;
+    const title = $("#exhausted-title");
+    const copy = $("#exhausted-copy");
+    const actions = $("#exhausted-actions");
+    actions.replaceChildren();
+
+    if (mode === "review") {
+      title.textContent = "오늘 복습할 문장을 모두 봤습니다.";
+      copy.textContent = "다음 복습일이 된 문장은 대시보드와 데일리 팝업에 다시 나옵니다.";
+      actions.append(el("a", { className: "btn btn-primary", text: "새 문장 학습", attrs: { href: "sentence.html" } }));
+    } else {
+      const total = Core.getSentencesForDifficulty(sentences, state.settings.difficulty).length;
+      const label = Core.getDifficultyLabel(state.settings.difficulty);
+      title.textContent = total
+        ? `${label} 문장 ${total}개를 모두 풀었습니다.`
+        : `${label} 난이도 문장이 없습니다.`;
+      copy.textContent = "오래전에 푼 문장부터 다시 풀거나, 설정에서 난이도를 바꿀 수 있습니다.";
+      if (total) {
+        const again = el("button", { className: "btn btn-primary", text: "다시 풀기", attrs: { type: "button" } });
+        again.addEventListener("click", () => {
+          repeat = true;
+          exhausted.hidden = true;
+          load();
+        });
+        actions.append(again);
+      }
+      actions.append(el("a", { className: "btn btn-ghost", text: "난이도 바꾸기", attrs: { href: "settings.html#difficulty" } }));
+      if (dueCount) {
+        actions.append(el("a", { className: "btn btn-soft", text: `복습 ${dueCount}개`, attrs: { href: "sentence.html?mode=review" } }));
+      }
+    }
+    $("button, a", actions)?.focus();
+  }
+
+  function load() {
+    current = pick();
+    renderProgress();
+    if (!current) {
+      showExhausted();
+      return;
+    }
+    answered = false;
+    card.hidden = false;
+    exhausted.hidden = true;
+    feedback.hidden = true;
+    reviewBtn.hidden = false;
+    nextBtn.hidden = false;
+    textEl.textContent = current.english;
+    textarea.value = "";
+    textarea.disabled = false;
+    checkBtn.disabled = false;
+    clearFieldError(textarea);
+
+    const label = Core.getDifficultyLabel(current.level);
+    if (mode === "review") {
+      const item = Core.findReviewItem(state, Core.getSentenceId(current));
+      modeChip.textContent = `복습 · ${label} · ${item ? `${item.level + 1}단계` : ""}`;
+    } else {
+      modeChip.textContent = `${repeat ? "다시 풀기" : "새 문장"} · ${label}`;
+    }
+    syncReviewButton();
+  }
+
+  if (!sentences.length) {
+    textEl.textContent = "문장 데이터를 불러오지 못했습니다.";
+    return;
+  }
+
+  checkBtn.addEventListener("click", () => {
+    if (answered || !current) return;
+    const answer = textarea.value.trim();
+    if (!answer) {
+      setFieldError(textarea, "해석을 입력한 뒤 확인하세요.");
+      textarea.focus();
+      return;
+    }
+    answered = true;
+    const score = Core.scoreKoreanTranslation(answer, current);
+    const result = Core.submitAnswer(state, {
+      contentId: Core.getSentenceId(current),
+      direction: "en-to-ko",
+      score,
+      source: mode === "review" ? "review" : "sentence",
+      now: new Date(),
+    });
+    answeredThisSession.add(Core.getSentenceId(current));
+    saveState(state);
+    textarea.disabled = true;
+    checkBtn.disabled = true;
+    renderFeedback(current, answer, result);
+    renderProgress();
+    syncReviewButton();
+    nextBtn.focus();
+  });
+
+  textarea.addEventListener("input", () => clearFieldError(textarea));
+  textarea.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) {
+      event.preventDefault();
+      checkBtn.click();
+    }
+  });
+
+  nextBtn.addEventListener("click", () => {
+    if (!answered && current) {
+      // 풀지 않고 넘기면 이번 세션에서만 건너뛴다(기록하지 않음).
+      answeredThisSession.add(Core.getSentenceId(current));
+    }
+    load();
+    textarea.focus();
+  });
+
+  reviewBtn.addEventListener("click", () => {
+    if (!current) return;
+    if (Core.addReviewItem(state, Core.getSentenceId(current), new Date())) saveState(state);
+    syncReviewButton();
+  });
+
+  $("#btn-play-audio")?.addEventListener("click", () => speakText(current?.english));
+
+  load();
+}
+
+function renderFeedback(sentence, userAnswer, result) {
+  const feedback = $("#feedback-section");
+  feedback.hidden = false;
+
+  const banner = $("#sentence-result");
+  banner.className = `result-banner ${result.isCorrect ? "pass" : "fail"}`;
+  banner.replaceChildren(
+    icon(result.isCorrect ? "check_circle" : "cancel"),
+    el("div", {}, [
+      el("strong", { className: "result-title", text: result.isCorrect ? "정답입니다" : "다시 볼 문장입니다" }),
+      el("p", { className: "result-copy", text: getReviewMessage(result, sentence) }),
+    ]),
+    el("span", { className: "result-score", text: `${result.score}점` }),
+  );
+
+  $("#feedback-user-answer").textContent = userAnswer;
+  $("#feedback-model-answer").textContent = sentence.answer;
+  $("#feedback-tip").textContent = sentence.tip || "-";
+  $("#feedback-grammar").textContent = sentence.grammar || "-";
+  $("#feedback-extra").textContent = sentence.extra || "-";
+}
+
+function getReviewMessage(result, sentence) {
+  const state = getState();
+  const item = Core.findReviewItem(state, Core.getSentenceId(sentence));
+  const base = `${Core.PASS_SCORE}점 이상이면 정답으로 봅니다.`;
+  switch (result.reviewAction) {
+    case "added":
+      return `${base} 복습 노트에 추가했고, 내일 다시 나옵니다.`;
+    case "promoted":
+      return `${base} 복습 ${item ? item.level + 1 : ""}단계로 올라갔습니다. 다음 복습: ${item ? formatDate(item.nextReviewAt) : "-"}`;
+    case "reset":
+      return `${base} 복습 단계를 처음으로 되돌렸고, 내일 다시 나옵니다.`;
+    default:
+      return base;
+  }
+}
+
+function speakText(text, lang = "en-US") {
+  const content = String(text || "").trim();
+  const status = $("#audio-status");
+  if (!content) return;
+  if (!window.speechSynthesis || typeof window.SpeechSynthesisUtterance === "undefined") {
+    if (status) status.textContent = "이 PC에서는 음성 재생을 쓸 수 없습니다.";
+    return;
+  }
+  window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(content);
+  utterance.lang = lang;
+  utterance.onerror = () => {
+    if (status) status.textContent = "음성을 재생하지 못했습니다. Windows 설정에서 영어 음성을 설치했는지 확인하세요.";
+  };
+  if (status) status.textContent = "";
+  window.speechSynthesis.speak(utterance);
+}
+
+/* ---------- 학업 성취도 (마이페이지) ---------- */
+
+function initMyPage() {
+  if (!$("#profile-name")) return;
+  const state = getState();
+  if (!requireProfile(state)) return;
+  const now = new Date();
+
+  $("#profile-name").textContent = `반가워요, ${getNickname(state)}님.`;
+  $("#profile-avatar-initial").textContent = getNickname(state).slice(0, 1).toUpperCase();
+  $("#total-days").textContent = `총 학습일 ${Core.countStudyDays(state.studyLog)}일 · 푼 문장 ${state.studyLog.length}개`;
+  $("#streak-chip").textContent = `${Core.computeStreak(state.studyLog, now)}일 연속`;
+  $("#profile-level").textContent = `난이도 ${Core.getDifficultyLabel(state.settings.difficulty)}`;
+
+  renderAccuracyChart(state, now);
+  renderHeatmap(state, now);
+  renderReviewNote(state);
+
+  $("#account-nickname").textContent = getNickname(state);
+  $("#account-difficulty").textContent = Core.getDifficultyLabel(state.settings.difficulty);
+  $("#account-created").textContent = state.profile?.createdAt ? formatDate(state.profile.createdAt) : "-";
+
+  const darkToggle = $("#dark-mode-toggle");
+  if (darkToggle) {
+    setSwitchState(darkToggle, state.darkMode);
+    darkToggle.addEventListener("switch-change", (event) => {
+      const latest = getState();
+      latest.darkMode = event.detail.on;
+      applyDarkMode(latest.darkMode);
+      saveState(latest);
     });
   }
 }
 
+function renderAccuracyChart(state, now) {
+  const area = $(".chart-area");
+  if (!area) return;
+  if (!state.studyLog.length) {
+    area.replaceChildren(createEmptyState("아직 학습 기록이 없습니다. 문장을 풀면 최근 7일 정답률이 표시됩니다.", "문장 학습 시작", "sentence.html"));
+    return;
+  }
+  const days = Core.getLast7Days(state.studyLog, now);
+  area.replaceChildren(...days.map((day) => {
+    const label = day.accuracy === null
+      ? `${day.key}: 기록 없음`
+      : `${day.key}: ${day.total}문장, 정답률 ${day.accuracy}%`;
+    const track = el("div", { className: `chart-track${day.accuracy === null ? " empty" : ""}` });
+    if (day.accuracy !== null) {
+      track.append(el("div", {
+        className: `chart-value${day.isToday ? " today" : ""}`,
+        attrs: { style: `height: ${Math.max(4, day.accuracy)}%;` },
+      }));
+    }
+    return el("div", { className: "chart-col", attrs: { title: label, role: "img", "aria-label": label } }, [
+      el("div", { className: "chart-number", text: day.accuracy === null ? "-" : `${day.accuracy}%` }),
+      track,
+      el("div", { className: "chart-label", text: day.isToday ? "오늘" : day.label }),
+    ]);
+  }));
+}
+
+function renderHeatmap(state, now) {
+  const heatmap = $(".heatmap");
+  if (!heatmap) return;
+  if (!state.studyLog.length) {
+    heatmap.classList.add("is-empty");
+    heatmap.replaceChildren(createEmptyState("학습한 날이 여기에 칠해집니다."));
+    return;
+  }
+  heatmap.classList.remove("is-empty");
+  const cells = Core.getHeatmap(state.studyLog, now, 12).map((cell) => el("div", {
+    className: `heat-cell l${cell.level}${cell.future ? " future" : ""}`,
+    attrs: { title: `${cell.key}: ${cell.count}문장` },
+  }));
+  heatmap.replaceChildren(...cells);
+  heatmap.setAttribute("aria-label", `최근 12주 동안 ${Core.countStudyDays(state.studyLog)}일 학습`);
+}
+
+function renderReviewNote(state) {
+  const container = $("#review-list-container");
+  if (!container) return;
+  const countEl = $("#review-list-count");
+  const startBtn = $("#review-start-btn");
+  const sentenceMap = getSentenceMap();
+
+  function render() {
+    const now = new Date();
+    const due = Core.getDueReviewItems(state, now);
+    const dueIds = new Set(due.map((item) => item.contentId));
+    if (countEl) countEl.textContent = `오늘 ${due.length}개 · 전체 ${state.reviewList.length}개`;
+    if (startBtn) startBtn.hidden = due.length === 0;
+    container.replaceChildren();
+
+    if (!state.reviewList.length) {
+      container.append(el("p", { className: "muted", text: "복습 노트가 비어 있습니다. 틀린 문장이 자동으로 모입니다." }));
+      return;
+    }
+
+    const items = state.reviewList.slice().sort((a, b) => Date.parse(a.nextReviewAt) - Date.parse(b.nextReviewAt));
+    const list = el("div", { className: "list-stack" });
+    items.forEach((item) => {
+      const sentence = sentenceMap.get(item.contentId);
+      const interval = Core.REVIEW_INTERVAL_DAYS[item.level];
+      const meta = `${item.level + 1}단계(${interval}일 간격) · 다음 복습 ${formatDate(item.nextReviewAt)}`;
+      const removeBtn = el("button", { className: "link-action", text: "삭제", attrs: { type: "button", "aria-label": `${sentence?.english || item.contentId} 복습 노트에서 삭제` } });
+      removeBtn.addEventListener("click", () => {
+        Core.removeReviewItem(state, item.contentId);
+        saveState(state);
+        render();
+      });
+      list.append(el("div", { className: "list-item" }, [
+        el("div", { className: "list-item-body" }, [
+          el("strong", { text: sentence?.english || item.contentId }),
+          el("p", { className: "fine-copy small", text: meta }),
+        ]),
+        dueIds.has(item.contentId) ? el("span", { className: "chip gold", text: "오늘" }) : null,
+        removeBtn,
+      ]));
+    });
+    container.append(list);
+  }
+
+  render();
+}
+
+/* ---------- 설정 ---------- */
+
+async function initSettings() {
+  const timeInput = $("#popup-time");
+  if (!timeInput) return;
+  const state = getState();
+  if (!requireProfile(state)) return;
+
+  const diffSelect = $("#difficulty");
+  const dailyPopupToggle = $("#daily-popup-toggle");
+  const autoStartToggle = $("#auto-start-toggle");
+  const autoLoginToggle = $("#auto-login-toggle");
+  const darkToggle = $("#dark-mode-toggle");
+  const nicknameInput = $("#settings-nickname");
+  const nicknameSave = $("#settings-nickname-save");
+  let appInfo = { isPackaged: false };
+  let osState = null;
+
+  try {
+    appInfo = (await window.mogugeo?.getAppInfo?.()) || appInfo;
+    if (appInfo.isPackaged) osState = await window.mogugeo?.getDailyPopup?.();
+  } catch (error) {
+    console.warn("앱 정보를 읽지 못했습니다.", error);
+  }
+
+  // 저장된 설정이 정본이다. OS 조회 결과로 덮어쓰지 않는다.
+  timeInput.value = state.settings.popupTime;
+  if (diffSelect) diffSelect.value = state.settings.difficulty;
+  setSwitchState(dailyPopupToggle, state.settings.dailyPopupEnabled);
+  setSwitchState(autoStartToggle, state.settings.autoStart);
+  setSwitchState(autoLoginToggle, state.settings.autoLogin);
+  setSwitchState(darkToggle, state.darkMode);
+  if (nicknameInput) nicknameInput.value = getNickname(state);
+
+  function renderSummary(lastResult) {
+    const s = state.settings;
+    $("#summary-title").textContent = s.dailyPopupEnabled
+      ? `매일 ${formatTimeLabel(s.popupTime)} 데일리 팝업`
+      : "데일리 팝업 꺼짐";
+    const parts = [
+      s.autoStart ? "Windows 시작 시 자동 실행" : "자동 실행 꺼짐",
+      s.autoLogin ? "자동 로그인 켜짐" : "자동 로그인 꺼짐",
+      `난이도 ${Core.getDifficultyLabel(s.difficulty)}`,
+    ];
+    $("#summary-copy").textContent = parts.join(" · ");
+
+    const osNote = $("#summary-os");
+    if (!appInfo.isPackaged) {
+      osNote.textContent = "개발 모드로 실행 중이라 작업 스케줄러와 시작 프로그램에는 반영하지 않습니다. 설치본에서 자동으로 반영됩니다.";
+    } else if (lastResult && !lastResult.applied) {
+      osNote.textContent = `Windows에 반영하지 못했습니다: ${lastResult.reason || "알 수 없는 오류"}`;
+    } else if (osState && osState.available) {
+      osNote.textContent = osState.enabled
+        ? `작업 스케줄러에 등록됨 (${osState.time ? formatTimeLabel(osState.time) : "시각 확인 불가"})`
+        : "작업 스케줄러에 등록된 팝업이 없습니다.";
+    } else {
+      osNote.textContent = "";
+    }
+  }
+
+  async function applyDailyPopup() {
+    const result = await window.mogugeo?.setDailyPopup?.(state.settings.dailyPopupEnabled, state.settings.popupTime);
+    if (appInfo.isPackaged) {
+      osState = await window.mogugeo?.getDailyPopup?.();
+    }
+    renderSummary(result);
+  }
+
+  renderSummary();
+
+  timeInput.addEventListener("change", async () => {
+    if (!Core.TIME_PATTERN.test(timeInput.value)) {
+      setFieldError(timeInput, "시각을 HH:MM 형식으로 입력하세요.");
+      return;
+    }
+    clearFieldError(timeInput);
+    state.settings.popupTime = timeInput.value;
+    saveState(state);
+    await applyDailyPopup();
+  });
+
+  diffSelect?.addEventListener("change", () => {
+    state.settings.difficulty = Core.normalizeDifficulty(diffSelect.value);
+    saveState(state);
+    renderSummary();
+  });
+
+  dailyPopupToggle?.addEventListener("switch-change", async (event) => {
+    state.settings.dailyPopupEnabled = event.detail.on;
+    saveState(state);
+    await applyDailyPopup();
+  });
+
+  autoStartToggle?.addEventListener("switch-change", async (event) => {
+    state.settings.autoStart = event.detail.on;
+    saveState(state);
+    const result = await window.mogugeo?.setAutoStart?.(state.settings.autoStart);
+    renderSummary(result);
+  });
+
+  autoLoginToggle?.addEventListener("switch-change", (event) => {
+    state.settings.autoLogin = event.detail.on;
+    saveState(state);
+    renderSummary();
+  });
+
+  darkToggle?.addEventListener("switch-change", (event) => {
+    state.darkMode = event.detail.on;
+    applyDarkMode(state.darkMode);
+    saveState(state);
+  });
+
+  nicknameSave?.addEventListener("click", () => {
+    const error = Core.validateNickname(nicknameInput.value);
+    const status = $("#settings-nickname-status");
+    if (error) {
+      setFieldError(nicknameInput, error);
+      nicknameInput.focus();
+      return;
+    }
+    clearFieldError(nicknameInput);
+    state.profile.nickname = nicknameInput.value.trim();
+    saveState(state);
+    renderProfileName(state);
+    if (status) status.textContent = "저장했습니다.";
+  });
+  nicknameInput?.addEventListener("input", () => {
+    clearFieldError(nicknameInput);
+    const status = $("#settings-nickname-status");
+    if (status) status.textContent = "";
+  });
+
+  $("#btn-open-popup")?.addEventListener("click", () => {
+    if (window.mogugeo?.openPopup) window.mogugeo.openPopup();
+    else window.location.href = "popup.html";
+  });
+
+  $("#btn-report-issue")?.addEventListener("click", () => {
+    window.mogugeo?.openExternal?.(ISSUES_URL);
+  });
+}
+
+/* ---------- 데일리 팝업 ---------- */
+
+function initPopup() {
+  const checkBtn = $("#popup-check");
+  if (!checkBtn) return;
+
+  const state = getState();
+  const now = new Date();
+  const today = now.toDateString();
+  const heroCopy = $("#popup-hero-copy");
+  const messageEl = $("#popup-message");
+  const resultEl = $("#popup-result");
+  const resultList = $("#popup-result-list");
+  const taskStack = $("#popup-task-stack");
+
+  $("#popup-footer-streak").textContent = `${Core.computeStreak(state.studyLog, now)}일 연속 학습`;
+  $("#popup-footer-time").textContent = state.settings.dailyPopupEnabled
+    ? `매일 ${formatTimeLabel(state.settings.popupTime)}`
+    : "자동 팝업 꺼짐";
+  if (state.profile) $("#popup-title").textContent = `${getNickname(state)}님, 오늘의 2문장`;
+
+  function setMessage(message, tone) {
+    messageEl.textContent = message;
+    messageEl.className = `popup-message small${tone ? ` ${tone}` : ""}`;
+  }
+
+  function renderResults(items) {
+    resultList.replaceChildren(...items.map((item, index) => el("div", { className: "list-item" }, [
+      el("div", { className: "list-item-body" }, [
+        el("strong", { className: `result-line ${item.isCorrect ? "pass" : "fail"}` }, [
+          icon(item.isCorrect ? "check_circle" : "cancel"),
+          el("span", { text: `과제 ${index + 1} · ${item.isCorrect ? "정답" : "복습 필요"}` }),
+        ]),
+        el("p", { className: "small muted", text: `모범 답안: ${item.correctAnswer || "-"}` }),
+      ]),
+      el("span", { className: "chip", text: `${item.score}점` }),
+    ])));
+    resultEl.hidden = false;
+  }
+
+  if (state.lastPopupDate === today) {
+    heroCopy.textContent = "오늘의 데일리 팝업을 이미 마쳤습니다. 내일 새 문제가 나옵니다.";
+    taskStack.hidden = true;
+    checkBtn.hidden = true;
+    const sentenceMap = getSentenceMap();
+    const todays = state.studyLog.filter((entry) => entry.source === "popup" && Core.toDayKey(entry.date) === Core.toDayKey(now));
+    if (todays.length) {
+      renderResults(todays.map((entry) => {
+        const sentence = sentenceMap.get(entry.contentId);
+        return {
+          score: entry.score,
+          isCorrect: entry.isCorrect,
+          correctAnswer: entry.direction === "ko-to-en" ? sentence?.english : sentence?.answer,
+        };
+      }));
+    }
+    return;
+  }
+
+  const picked = Core.pickPopupSentences(state, getSentences(), now);
+  const tasks = [
+    { sentence: picked[0], direction: "en-to-ko", index: 1 },
+    { sentence: picked[1], direction: "ko-to-en", index: 2 },
+  ].filter((task) => task.sentence);
+
+  if (!tasks.length) {
+    heroCopy.textContent = "문장 데이터를 불러오지 못했습니다.";
+    taskStack.hidden = true;
+    checkBtn.hidden = true;
+    return;
+  }
+
+  [1, 2].forEach((index) => {
+    const task = tasks.find((item) => item.index === index);
+    const card = $(`#popup-task-${index}`);
+    if (!task) {
+      card.hidden = true;
+      return;
+    }
+    task.input = $(`#popup-answer-${index}`);
+    $(`#popup-question-${index}`).textContent = task.direction === "en-to-ko" ? task.sentence.english : task.sentence.answer;
+    task.input.value = "";
+    task.input.addEventListener("input", () => {
+      clearFieldError(task.input);
+      setMessage("");
+    });
+    task.input.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        if (!checkBtn.disabled) checkBtn.click();
+      }
+    });
+  });
+
+  checkBtn.addEventListener("click", () => {
+    let firstEmpty = null;
+    tasks.forEach((task) => {
+      if (!task.input.value.trim()) {
+        setFieldError(task.input, "답을 입력하세요.");
+        firstEmpty = firstEmpty || task.input;
+      }
+    });
+    if (firstEmpty) {
+      setMessage("두 문제 모두 답을 입력해야 채점할 수 있습니다.", "error");
+      firstEmpty.focus();
+      return;
+    }
+
+    const at = new Date();
+    const latest = getState();
+    const results = tasks.map((task) => {
+      const score = task.direction === "en-to-ko"
+        ? Core.scoreKoreanTranslation(task.input.value, task.sentence)
+        : Core.scoreEnglishSentence(task.input.value, task.sentence);
+      const outcome = Core.submitAnswer(latest, {
+        contentId: Core.getSentenceId(task.sentence),
+        direction: task.direction,
+        score,
+        source: "popup",
+        now: at,
+      });
+      task.input.disabled = true;
+      return {
+        score: outcome.score,
+        isCorrect: outcome.isCorrect,
+        correctAnswer: task.direction === "en-to-ko" ? task.sentence.answer : task.sentence.english,
+      };
+    });
+    latest.lastPopupDate = today;
+    saveState(latest);
+
+    renderResults(results);
+    checkBtn.hidden = true;
+    heroCopy.textContent = "오늘의 데일리 팝업을 마쳤습니다.";
+    const wrong = results.filter((item) => !item.isCorrect).length;
+    setMessage(wrong ? `틀린 ${wrong}문장은 복습 노트에 담았습니다. 결과를 저장했습니다.` : "모두 맞혔습니다. 결과를 저장했습니다.", "success");
+    $("#popup-footer-streak").textContent = `${Core.computeStreak(latest.studyLog, at)}일 연속 학습`;
+    $("#popup-open-main")?.focus();
+  });
+
+  $("#popup-answer-1")?.focus();
+}
+
+function initPopupLinks() {
+  $("#popup-open-main")?.addEventListener("click", (event) => {
+    if (window.mogugeo?.showMain) {
+      event.preventDefault();
+      window.mogugeo.showMain();
+    }
+  });
+}
+
+/* ---------- 시작 ---------- */
+
 async function initializePage() {
   const state = getState();
-  initDarkMode(state);
+  applyDarkMode(state.darkMode);
+  renderProfileName(state);
   initSwitches();
-  initDemoActions();
   initTitlebar();
   initSlideMenu();
+  initExternalLinks();
+  initPopupLinks();
 
   await (window.MoGugeoData?.ready || Promise.resolve());
 
@@ -1621,12 +1194,12 @@ async function initializePage() {
   initDashboard();
   initSentence();
   initMyPage();
-  initSettings();
+  await initSettings();
   initPopup();
 }
 
 document.addEventListener("DOMContentLoaded", () => {
   initializePage().catch((error) => {
-    console.error("Failed to initialize MoGugeo renderer data.", error);
+    console.error("모국어 화면 초기화 실패", error);
   });
 });

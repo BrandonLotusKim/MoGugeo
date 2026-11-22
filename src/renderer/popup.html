@@ -1,87 +1,64 @@
 <!DOCTYPE html>
-<!-- EXE 팝업 화면: 지정 시간 노출용 짧은 학습 창 -->
+<!-- 데일리 팝업: 지정 시각에 뜨는 2문제 학습 창 (창 제어는 OS 프레임 사용) -->
 <html lang="ko">
 <head>
-  
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; script-src 'self'; connect-src 'self' https:">
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; script-src 'self'; connect-src 'self'">
   <title>모국어 - 데일리 팝업</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <main class="popup-stage">
-    <!-- 어두운 배경 위 작은 팝업 창 배치 레이아웃 -->
     <section class="popup-window">
-      <!-- 실제 학습 미션 표시 팝업 본체 -->
       <header class="window-header">
-        <div class="window-brand"><span class="material-symbols-outlined">auto_stories</span><span>모닝퀴즈팝업</span></div>
-        <div class="inline-actions">
-          <button class="icon-button" data-demo-action type="button"><span class="material-symbols-outlined">remove</span></button>
-          <button class="icon-button" data-demo-action type="button"><span class="material-symbols-outlined">close</span></button>
-        </div>
+        <div class="window-brand"><span class="material-symbols-outlined" aria-hidden="true">auto_stories</span><span>모국어 데일리 팝업</span></div>
       </header>
       <div class="window-body">
-        <h1 class="window-title">좋은 아침입니다!</h1>
-        <p class="hero-copy" id="popup-hero-copy">오늘의 문장을 학습할 준비가 되셨나요?</p>
+        <h1 class="window-title" id="popup-title">오늘의 2문장</h1>
+        <p class="hero-copy" id="popup-hero-copy">두 문제를 풀고 정답 확인을 누르세요.</p>
 
         <div class="task-stack" id="popup-task-stack">
-          <!-- 오늘의 짧은 학습 과제 목록 -->
           <article class="task-card" id="popup-task-1">
-            <div class="section-label">과제 01</div>
-            <p class="fine-copy small" id="popup-direction-1">Translate this sentence into Korean.</p>
-            <div class="problem-box"><p class="problem-text" id="popup-question-1">Loading sentence...</p></div>
+            <div class="section-label">과제 1 · 영어 → 한국어</div>
+            <div class="problem-box"><p class="problem-text" id="popup-question-1">문장을 불러오는 중...</p></div>
             <div class="field">
-              <label for="popup-answer-1">Your answer</label>
-              <input class="text-input" id="popup-answer-1" type="text" placeholder="뜻을 입력하세요...">
+              <label for="popup-answer-1">우리말 해석</label>
+              <input class="text-input" id="popup-answer-1" type="text" placeholder="뜻을 우리말로 입력하세요">
             </div>
           </article>
           <article class="task-card" id="popup-task-2">
-            <div class="section-label">과제 02</div>
-            <p class="fine-copy small" id="popup-direction-2">Translate this sentence into English.</p>
-            <div class="problem-box"><p class="problem-text" id="popup-question-2">Loading sentence...</p></div>
+            <div class="section-label">과제 2 · 한국어 → 영어</div>
+            <div class="problem-box"><p class="problem-text" id="popup-question-2">문장을 불러오는 중...</p></div>
             <div class="field">
-              <label for="popup-answer-2">Your answer</label>
-              <input class="text-input" id="popup-answer-2" type="text" placeholder="영문으로 입력하세요...">
+              <label for="popup-answer-2">영어 문장</label>
+              <input class="text-input" id="popup-answer-2" type="text" placeholder="영어 문장으로 입력하세요" lang="en">
             </div>
           </article>
         </div>
 
         <section class="task-card spacer-top" id="popup-result" hidden>
-          <div class="section-label">Result</div>
-          <div class="list-stack">
-            <div class="list-item" id="popup-result-item-1">
-              <div>
-                <strong id="popup-result-1-status">Task 1</strong>
-                <p class="small muted" id="popup-result-1-answer"></p>
-              </div>
-              <span class="chip" id="popup-result-1-score"></span>
-            </div>
-            <div class="list-item" id="popup-result-item-2">
-              <div>
-                <strong id="popup-result-2-status">Task 2</strong>
-                <p class="small muted" id="popup-result-2-answer"></p>
-              </div>
-              <span class="chip" id="popup-result-2-score"></span>
-            </div>
-          </div>
+          <div class="section-label">결과</div>
+          <div class="list-stack" id="popup-result-list"></div>
         </section>
 
         <div class="spacer-lg">
           <button class="btn btn-primary" id="popup-check" type="button" style="width: 100%;">정답 확인</button>
         </div>
-        <p class="small muted" id="popup-message" style="text-align: center; margin: 12px 0 0;"></p>
+        <p class="popup-message small" id="popup-message" role="status"></p>
         <div class="spacer-top" style="text-align: center;">
-          <a class="link-action" href="dashboard.html">메인 대시보드로 이동 <span class="material-symbols-outlined">arrow_forward</span></a>
+          <a class="link-action" id="popup-open-main" href="dashboard.html">모국어 메인 창 열기 <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span></a>
         </div>
       </div>
       <footer class="window-footer">
         <div class="inline-actions">
-          <span class="material-symbols-outlined" style="color: var(--accent);">bolt</span>
-          <span>12일 연속 달성</span>
+          <span class="material-symbols-outlined" style="color: var(--accent);" aria-hidden="true">bolt</span>
+          <span id="popup-footer-streak">0일 연속 학습</span>
         </div>
-        <div>Daily Focus: 08:30 AM</div>
+        <div id="popup-footer-time"></div>
       </footer>
     </section>
   </main>
+  <script src="core.js"></script>
   <script src="data-loader.js"></script>
   <script src="app.js"></script>
 </body>

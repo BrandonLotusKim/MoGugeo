@@ -25,6 +25,9 @@ jobs:
       - name: TypeScript build
         run: npm run build
 
+      - name: Unit tests
+        run: node --test
+
       - name: Verify renderer assets
         shell: pwsh
         run: |

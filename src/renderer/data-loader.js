@@ -1,8 +1,6 @@
 window.MoGugeoData = {
   ready: null,
   sentences: [],
-  words: [],
-  expressions: [],
   meta: null,
 };
 
@@ -45,16 +43,13 @@ async function loadJson(url) {
 
 window.MoGugeoData.ready = (async () => {
   const base = new URL("../data/", document.baseURI).href;
-  const [sentences, words, expressions, meta] = await Promise.all([
+  // 단어·표현 데이터(words.json, expressions.json)는 비활성 기능이라 불러오지 않는다.
+  const [sentences, meta] = await Promise.all([
     loadJson(`${base}sentences.json`),
-    loadJson(`${base}words.json`),
-    loadJson(`${base}expressions.json`),
     loadJson(`${base}meta.json`),
   ]);
 
   window.MoGugeoData.sentences = sentences;
-  window.MoGugeoData.words = words;
-  window.MoGugeoData.expressions = expressions;
   window.MoGugeoData.meta = meta;
 })().catch((error) => {
   console.error("MoGugeoData could not be loaded.", error);

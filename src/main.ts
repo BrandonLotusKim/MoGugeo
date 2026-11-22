@@ -92,6 +92,8 @@ function createWindow(): void {
 // 데일리 팝업 전용 소형 윈도우 생성
 function createPopupWindow(): void {
   if (popupWindow) {
+    if (popupWindow.isMinimized()) popupWindow.restore();
+    popupWindow.show();
     popupWindow.focus();
     return;
   }
@@ -112,11 +114,22 @@ function createPopupWindow(): void {
     },
   });
 
+  popupWindow.setMenuBarVisibility(false);
   popupWindow.loadFile(path.join(__dirname, "../src/renderer/popup.html"));
 
   popupWindow.on("closed", () => {
     popupWindow = null;
   });
+}
+
+function showMainWindow(): void {
+  if (mainWindow) {
+    if (mainWindow.isMinimized()) mainWindow.restore();
+    mainWindow.show();
+    mainWindow.focus();
+  } else {
+    createWindow();
+  }
 }
 
 // 시스템 트레이 아이콘 및 컨텍스트 메뉴 생성
@@ -127,18 +140,11 @@ function createTray(): void {
 
   const contextMenu = Menu.buildFromTemplate([
     {
-      label: "대시보드 열기",
-      click: () => {
-        if (mainWindow) {
-          mainWindow.show();
-          mainWindow.focus();
-        } else {
-          createWindow();
-        }
-      },
+      label: "모국어 열기",
+      click: showMainWindow,
     },
     {
-      label: "모닝 퀴즈 팝업",
+      label: "데일리 팝업 열기",
       click: createPopupWindow,
     },
     { type: "separator" },
@@ -150,14 +156,7 @@ function createTray(): void {
 
   tray.setContextMenu(contextMenu);
 
-  tray.on("double-click", () => {
-    if (mainWindow) {
-      mainWindow.show();
-      mainWindow.focus();
-    } else {
-      createWindow();
-    }
-  });
+  tray.on("double-click", showMainWindow);
 }
 
 // IPC 핸들러: 로그아웃 시 프레임리스 로그인 창으로 전환
@@ -171,23 +170,32 @@ ipcMain.handle("shrink-window", () => {
   isTransitioning = false;
 });
 
-// IPC 핸들러: 커스텀 타이틀바 창 컨트롤
-ipcMain.handle("window-minimize", () => {
-  if (mainWindow) mainWindow.minimize();
+// IPC 핸들러: 커스텀 타이틀바 창 컨트롤 (요청을 보낸 창 기준)
+ipcMain.handle("window-minimize", (event) => {
+  BrowserWindow.fromWebContents(event.sender)?.minimize();
 });
 
-ipcMain.handle("window-close", () => {
-  if (mainWindow) mainWindow.close();
+ipcMain.handle("window-close", (event) => {
+  BrowserWindow.fromWebContents(event.sender)?.close();
 });
 
-ipcMain.handle("window-maximize", () => {
-  if (mainWindow) {
-    if (mainWindow.isMaximized()) {
-      mainWindow.unmaximize();
-    } else {
-      mainWindow.maximize();
-    }
+ipcMain.handle("window-maximize", (event) => {
+  const win = BrowserWindow.fromWebContents(event.sender);
+  if (!win) return;
+  if (win.isMaximized()) {
+    win.unmaximize();
+  } else {
+    win.maximize();
   }
+});
+
+// IPC 핸들러: 팝업에서 메인 창(대시보드 또는 로그인) 열기
+ipcMain.handle("show-main", () => {
+  showMainWindow();
+});
+
+ipcMain.handle("get-app-info", () => {
+  return { isPackaged: app.isPackaged, version: app.getVersion() };
 });
 
 // IPC 핸들러: 렌더러에서 팝업 열기 요청
@@ -210,12 +218,20 @@ ipcMain.handle("get-daily-popup", () => {
 
 ipcMain.handle("set-auto-start", (_event, enabled: unknown) => {
   if (!isBoolean(enabled)) {
-    return;
+    return { applied: false, reason: "invalid" };
+  }
+  // 개발 모드에서는 electron.exe 가 시작 프로그램에 등록되지 않게 한다.
+  if (!app.isPackaged) {
+    return { applied: false, reason: "development" };
   }
   app.setLoginItemSettings({ openAtLogin: enabled });
+  return { applied: true };
 });
 
 ipcMain.handle("get-auto-start", () => {
+  if (!app.isPackaged) {
+    return null;
+  }
   return app.getLoginItemSettings().openAtLogin;
 });
 
@@ -267,7 +283,23 @@ ipcMain.handle("expand-window", (_event, target: unknown) => {
   isTransitioning = false;
 });
 
+// 단일 인스턴스: 앱이 켜져 있을 때 작업 스케줄러가 --popup 으로 실행되면
+// 새 프로세스를 띄우지 않고 기존 프로세스에서 팝업만 연다.
+const hasInstanceLock = app.requestSingleInstanceLock();
+if (!hasInstanceLock) {
+  app.quit();
+}
+
+app.on("second-instance", (_event, argv) => {
+  if (argv.includes("--popup")) {
+    createPopupWindow();
+  } else {
+    showMainWindow();
+  }
+});
+
 app.whenReady().then(() => {
+  if (!hasInstanceLock) return;
   app.setAppUserModelId("com.brandonlotuskim.mogugeo");
   if (isPopupMode) {
     createPopupWindow();

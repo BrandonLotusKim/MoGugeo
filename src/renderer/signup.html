@@ -1,63 +1,58 @@
 <!DOCTYPE html>
-<!-- 회원가입 화면: 새 계정 생성 페이지 -->
+<!-- 프로필 만들기: 닉네임과 난이도를 이 PC에 저장 -->
 <html lang="ko">
 <head>
-  
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; script-src 'self'; connect-src 'self' https:">
-  <title>모구지오 - 회원가입</title>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; script-src 'self'; connect-src 'self'">
+  <title>모국어 - 프로필 만들기</title>
   <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-  <main class="auth-shell">
-    <section class="auth-card">
-      <span class="eyebrow">모구지오</span>
-      <h1 class="auth-title">새 계정 만들기</h1>
-      <p class="auth-subtitle" style="color: #7d879c;">모구지오의 학습 기록과 데일리 팝업을 계속 사용하기 위한 계정을 만들어주세요.</p>
-      <form data-signup-form>
-        <div class="field">
-          <label for="signup-username">아이디</label>
-          <input class="text-input" id="signup-username" type="text" placeholder="영문, 숫자, 언더스코어 4~20자">
-        </div>
-        <div class="field">
-          <label for="signup-password">비밀번호</label>
-          <input class="text-input" id="signup-password" type="password" placeholder="8자 이상 입력하세요">
-        </div>
-        <div class="field">
-          <label for="signup-password-confirm">비밀번호 확인</label>
-          <input class="text-input" id="signup-password-confirm" type="password" placeholder="비밀번호를 다시 입력하세요">
-        </div>
+<body style="background: transparent;">
+  <div class="login-window">
+    <div class="login-titlebar">
+      <div class="login-titlebar-drag"></div>
+      <div class="login-titlebar-btns">
+        <button class="titlebar-btn" id="btn-minimize" type="button" aria-label="최소화">&#x2013;</button>
+        <button class="titlebar-btn titlebar-btn-close" id="btn-close" type="button" aria-label="닫기">&#x2715;</button>
+      </div>
+    </div>
+
+    <main class="login-body login-body-scroll">
+      <span class="eyebrow">모국어</span>
+      <h1 class="auth-title" style="margin-top: 12px;">프로필 만들기</h1>
+      <p class="login-desc">비밀번호 없이 이 PC에 저장되는 로컬 프로필입니다.</p>
+      <p class="notice-box small" id="signup-replace-notice" hidden></p>
+
+      <form data-signup-form novalidate>
         <div class="field">
           <label for="signup-nickname">닉네임</label>
-          <input class="text-input" id="signup-nickname" type="text" placeholder="예: Arthur">
+          <input class="text-input" id="signup-nickname" type="text" maxlength="16" autocomplete="nickname" aria-describedby="signup-nickname-help">
+          <p class="field-help" id="signup-nickname-help">2~16자. 대시보드 인사말에 쓰입니다.</p>
         </div>
+
         <div class="field">
-          <label for="signup-email">이메일 (선택)</label>
-          <input class="text-input" id="signup-email" type="text" placeholder="email@example.com">
+          <span class="field-label" id="signup-difficulty-label">난이도</span>
+          <div class="choice-group" id="signup-difficulty" role="radiogroup" aria-labelledby="signup-difficulty-label" tabindex="-1">
+            <label class="choice"><input type="radio" name="difficulty" value="beginner"><span><strong>초급</strong><small>짧은 일상 문장</small></span></label>
+            <label class="choice"><input type="radio" name="difficulty" value="intermediate"><span><strong>중급</strong><small>업무·여행 문장</small></span></label>
+            <label class="choice"><input type="radio" name="difficulty" value="advanced"><span><strong>고급</strong><small>긴 구문·추상 표현</small></span></label>
+          </div>
         </div>
-        <div class="field">
-          <label for="signup-phone">휴대전화 (선택)</label>
-          <input class="text-input" id="signup-phone" type="text" placeholder="숫자 또는 하이픈만 입력">
-        </div>
-        <div class="field">
-          <label for="signup-carrier">통신사 (선택)</label>
-          <select class="text-input" id="signup-carrier">
-            <option value="">선택</option>
-            <option value="SKT">SKT</option>
-            <option value="KT">KT</option>
-            <option value="LG U+">LG U+</option>
-            <option value="알뜰폰">알뜰폰</option>
-          </select>
-        </div>
+
         <div class="check-row muted small">
-          <label for="signup-agree"><input id="signup-agree" type="checkbox"> 약관 및 개인정보 수집에 동의합니다.</label>
+          <label for="signup-agree"><input id="signup-agree" type="checkbox">
+            <a data-external href="https://github.com/BrandonLotusKim/MoGugeo/blob/main/Document/TermsOfService.md">이용약관</a>과
+            <a data-external href="https://github.com/BrandonLotusKim/MoGugeo/blob/main/Document/PrivacyPolicy.md">개인정보 처리방침</a>에 동의합니다.</label>
         </div>
-        <div class="inline-actions spacer-top">
-          <button class="btn btn-primary" type="submit">회원가입</button>
-          <a class="btn btn-ghost" href="main.html">이미 계정이 있으신가요? 로그인</a>
+
+        <div class="login-actions">
+          <button class="btn btn-primary" type="submit">프로필 만들고 시작</button>
+          <a class="btn btn-ghost" href="main.html">돌아가기</a>
         </div>
       </form>
-    </section>
-  </main>
+    </main>
+  </div>
+  <script src="core.js"></script>
   <script src="data-loader.js"></script>
   <script src="app.js"></script>
 </body>

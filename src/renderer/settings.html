@@ -1,83 +1,77 @@
 <!DOCTYPE html>
-<!-- 설정 화면: 앱 실행 방식과 학습 옵션 조정 -->
+<!-- 설정: 데일리 팝업, 실행 방식, 난이도, 프로필 -->
 <html lang="ko">
 <head>
-  
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; script-src 'self'; connect-src 'self' https:">
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; script-src 'self'; connect-src 'self'">
   <title>모국어 - 설정</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div class="shell app-shell">
-    <aside class="sidebar">
-      <div class="brand-mark">
-        <h1 class="brand-title">모국어</h1>
-        <p class="brand-subtitle">학습자</p>
-      </div>
-      <nav class="sidebar-nav">
-        <a class="nav-link" href="dashboard.html"><span class="material-symbols-outlined">dashboard</span><span>대시보드</span></a>
-        <a class="nav-link" href="sentence.html"><span class="material-symbols-outlined">menu_book</span><span>문장 학습</span></a>
-        <a class="nav-link" href="mypage.html"><span class="material-symbols-outlined">insights</span><span>마이페이지</span></a>
-      </nav>
-      <div class="sidebar-cta">
-        <a class="btn btn-primary" href="popup.html">팝업 미리보기</a>
-      </div>
-      <div class="sidebar-footer">
-        <a href="settings.html"><span class="material-symbols-outlined">settings</span><span>설정</span></a>
-        <a href="main.html"><span class="material-symbols-outlined">logout</span><span>로그아웃</span></a>
-      </div>
-    </aside>
     <div class="main-area">
-    <!-- 커스텀 타이틀바 -->
-    <div class="app-titlebar">
-      <div class="app-titlebar-drag"></div>
-      <div class="topbar-window-btns">
-        <button class="titlebar-btn" id="btn-minimize" type="button">&#x2013;</button>
-        <button class="titlebar-btn" id="btn-maximize" type="button">&#x25A1;</button>
-        <button class="titlebar-btn titlebar-btn-close" id="btn-close" type="button">&#x2715;</button>
+      <div class="app-titlebar">
+        <div class="app-titlebar-drag"></div>
+        <div class="topbar-window-btns">
+          <button class="titlebar-btn" id="btn-minimize" type="button" aria-label="최소화">&#x2013;</button>
+          <button class="titlebar-btn" id="btn-maximize" type="button" aria-label="최대화">&#x25A1;</button>
+          <button class="titlebar-btn titlebar-btn-close" id="btn-close" type="button" aria-label="닫기">&#x2715;</button>
+        </div>
       </div>
-    </div>
       <header class="topbar">
         <a class="topbar-brand" href="dashboard.html">모국어</a>
+        <nav class="topbar-nav" aria-label="주 메뉴">
+          <a href="dashboard.html">대시보드</a>
+          <a href="sentence.html">문장 학습</a>
+          <a href="mypage.html">학업 성취도</a>
+          <a href="settings.html" class="active" aria-current="page">설정</a>
+        </nav>
         <div class="topbar-actions">
-          <button class="icon-button" id="btn-menu-open" type="button"><span class="material-symbols-outlined">menu</span></button>
+          <span class="topbar-user"><span class="material-symbols-outlined" aria-hidden="true">person</span><span data-profile-name>학습자</span></span>
+          <button class="icon-button" id="btn-menu-open" type="button" aria-label="메뉴 열기" aria-controls="slide-menu" aria-expanded="false"><span class="material-symbols-outlined" aria-hidden="true">menu</span></button>
         </div>
       </header>
       <div class="page-body-wrap"><main class="page-body">
         <section class="surface">
-          <!-- 현재 루틴 요약, 실행 설정, 학습 설정, 계정 관리 -->
           <div class="hero-grid">
             <div>
-              <div class="section-label">Settings</div>
-              <h1 class="hero-title" style="font-size: clamp(38px, 4vw, 58px);">학습 루틴과<br>실행 방식을 조정합니다.</h1>
-              <p class="hero-copy">시안에 있던 계정 관리 구역의 구조를 확장해서, 알림 시간과 자동 실행, 난이도, 계정 액션을 한 페이지에 정리했습니다.</p>
+              <div class="section-label">설정</div>
+              <h1 class="hero-title" style="font-size: clamp(34px, 3.6vw, 52px);">학습 루틴과<br>실행 방식을 조정합니다.</h1>
+              <p class="hero-copy">바꾼 값은 바로 저장됩니다.</p>
             </div>
-            <div class="status-card">
+            <div class="status-card" aria-live="polite">
               <div class="section-label">현재 루틴</div>
-              <h2 class="section-title spacer-top">오전 08:30 자동 시작</h2>
-              <p class="hero-copy">Windows 실행 시 자동 시작과 자동 로그인이 켜져 있습니다.</p>
+              <h2 class="section-title spacer-top" id="summary-title"></h2>
+              <p class="hero-copy" id="summary-copy"></p>
+              <p class="fine-copy small" id="summary-os"></p>
             </div>
           </div>
 
           <section class="board-grid spacer-lg">
-            <!-- 좌측 실행/알림, 우측 학습 옵션 -->
             <article class="card">
               <div class="section-label">알림 및 실행</div>
               <div class="field spacer-top">
-                <label for="popup-time">학습 팝업 시간</label>
+                <label for="popup-time">데일리 팝업 시각</label>
                 <input class="text-input" id="popup-time" type="time" value="08:30">
               </div>
               <div class="setting-row">
-                <div class="setting-info"><span class="material-symbols-outlined">notifications</span><span>데일리 팝업 사용</span></div>
-                <button class="switch on" id="daily-popup-toggle" role="switch" aria-checked="true" type="button"></button>
+                <div class="setting-info"><span class="material-symbols-outlined" aria-hidden="true">notifications</span><span id="label-daily-popup">데일리 팝업 사용</span></div>
+                <button class="switch" id="daily-popup-toggle" role="switch" aria-checked="false" aria-labelledby="label-daily-popup" type="button"></button>
               </div>
               <div class="setting-row">
-                <div class="setting-info"><span class="material-symbols-outlined">computer</span><span>Windows 시작 시 자동 실행</span></div>
-                <button class="switch on" id="auto-start-toggle" role="switch" aria-checked="true" type="button"></button>
+                <div class="setting-info"><span class="material-symbols-outlined" aria-hidden="true">computer</span><span id="label-auto-start">Windows 시작 시 자동 실행</span></div>
+                <button class="switch" id="auto-start-toggle" role="switch" aria-checked="false" aria-labelledby="label-auto-start" type="button"></button>
               </div>
               <div class="setting-row">
-                <div class="setting-info"><span class="material-symbols-outlined">key</span><span>자동 로그인 유지</span></div>
-                <button class="switch on" id="auto-login-toggle" role="switch" aria-checked="true" type="button"></button>
+                <div class="setting-info"><span class="material-symbols-outlined" aria-hidden="true">key</span><span id="label-auto-login">자동 로그인 (시작 화면 건너뛰기)</span></div>
+                <button class="switch" id="auto-login-toggle" role="switch" aria-checked="false" aria-labelledby="label-auto-login" type="button"></button>
+              </div>
+              <div class="setting-row">
+                <div class="setting-info"><span class="material-symbols-outlined" aria-hidden="true">dark_mode</span><span id="label-dark">다크 모드</span></div>
+                <button class="switch" id="dark-mode-toggle" role="switch" aria-checked="false" aria-labelledby="label-dark" type="button"></button>
+              </div>
+              <div class="spacer-top">
+                <button class="btn btn-soft" id="btn-open-popup" type="button">데일리 팝업 지금 열기</button>
               </div>
             </article>
             <article class="card">
@@ -85,50 +79,44 @@
               <div class="field spacer-top">
                 <label for="difficulty">난이도</label>
                 <select class="text-input" id="difficulty">
-                  <option>초급</option>
-                  <option selected>중급</option>
-                  <option>고급</option>
+                  <option value="beginner">초급</option>
+                  <option value="intermediate">중급</option>
+                  <option value="advanced">고급</option>
                 </select>
+                <p class="field-help">문장 학습과 데일리 팝업에 나올 문장의 난이도입니다.</p>
               </div>
               <div class="field">
-                <label for="learning-type">학습 유형</label>
-                <select class="text-input" id="learning-type">
-                  <option selected>문장 해석 중심</option>
-                </select>
+                <span class="field-label">학습 유형</span>
+                <strong class="small">문장 해석 (현재 제공하는 유일한 유형)</strong>
               </div>
             </article>
           </section>
 
           <section class="card spacer-lg">
-            <!-- 이메일/비밀번호/구독 계정 제어 영역 -->
-            <div class="section-label">계정</div>
+            <div class="section-label">프로필</div>
             <div class="account-grid spacer-top">
-              <div>
-                <div class="setting-row">
-                  <div class="setting-info"><span class="material-symbols-outlined">mail</span><span>arthur.scholar@email.com</span></div>
-                  <button class="btn btn-ghost" data-demo-action type="button">이메일 변경</button>
+              <div class="field">
+                <label for="settings-nickname">닉네임</label>
+                <div class="inline-field">
+                  <input class="text-input" id="settings-nickname" type="text" maxlength="16">
+                  <button class="btn btn-ghost" id="settings-nickname-save" type="button">저장</button>
                 </div>
-                <div class="setting-row">
-                  <div class="setting-info"><span class="material-symbols-outlined">lock</span><span>비밀번호</span></div>
-                  <button class="btn btn-ghost" data-demo-action type="button">비밀번호 변경</button>
-                </div>
+                <p class="field-help" id="settings-nickname-status" role="status"></p>
               </div>
               <div>
-                <div class="setting-row">
-                  <div class="setting-info"><span class="material-symbols-outlined">credit_card</span><span>Scholar 프리미엄 플랜</span></div>
-                  <span class="chip gold">활성</span>
-                </div>
-                <div class="spacer-top">
-                  <a class="btn btn-ghost" data-logout-link href="#">로그아웃</a>
+                <p class="fine-copy">프로필과 학습 기록은 이 PC에만 저장됩니다. 계정 서버와 기기 간 동기화는 다음 버전에서 제공할 예정입니다.</p>
+                <div class="inline-actions spacer-top">
+                  <a class="btn btn-ghost" href="onboarding.html">처음 시작 안내 다시 보기</a>
+                  <button class="btn btn-ghost" data-logout type="button">로그아웃</button>
                 </div>
               </div>
             </div>
             <div class="setting-row spacer-top">
               <div class="setting-info">
-                <span class="material-symbols-outlined">bug_report</span>
+                <span class="material-symbols-outlined" aria-hidden="true">bug_report</span>
                 <div>
                   <strong>문제 신고</strong>
-                  <p class="fine-copy">버그나 콘텐츠 오류를 발견하면 알려주세요.</p>
+                  <p class="fine-copy">버그나 콘텐츠 오류를 GitHub Issues로 알려 주세요.</p>
                 </div>
               </div>
               <button class="btn btn-ghost" id="btn-report-issue" type="button">문제 신고</button>
@@ -137,33 +125,32 @@
         </section>
         <footer class="page-footer">
           <div>© 2026 모국어</div>
-          <nav>
-            <a href="#">고객 센터</a>
-            <a href="mypage.html">마이페이지</a>
-            <a href="#">개인정보 처리방침</a>
-            <a href="#">이용 약관</a>
+          <nav aria-label="바닥글">
+            <a data-external href="https://github.com/BrandonLotusKim/MoGugeo/issues">문제 신고</a>
+            <a data-external href="https://github.com/BrandonLotusKim/MoGugeo/blob/main/Document/PrivacyPolicy.md">개인정보 처리방침</a>
+            <a data-external href="https://github.com/BrandonLotusKim/MoGugeo/blob/main/Document/TermsOfService.md">이용약관</a>
           </nav>
         </footer>
       </main></div>
     </div>
   </div>
-  <!-- 슬라이드 메뉴 오버레이 -->
   <div class="menu-overlay" id="menu-overlay"></div>
-  <aside class="slide-menu" id="slide-menu">
+  <aside class="slide-menu" id="slide-menu" aria-label="메뉴">
     <div class="slide-menu-header">
       <span class="brand-title" style="font-size:20px;">모국어</span>
-      <button class="icon-button" id="btn-menu-close" type="button"><span class="material-symbols-outlined">close</span></button>
+      <button class="icon-button" id="btn-menu-close" type="button" aria-label="메뉴 닫기"><span class="material-symbols-outlined" aria-hidden="true">close</span></button>
     </div>
     <nav class="slide-menu-nav">
-      <a href="dashboard.html"><span class="material-symbols-outlined">dashboard</span><span>대시보드</span></a>
-      <a href="sentence.html"><span class="material-symbols-outlined">menu_book</span><span>문장 학습</span></a>
-      <a href="mypage.html"><span class="material-symbols-outlined">insights</span><span>마이페이지</span></a>
-      <a href="settings.html"><span class="material-symbols-outlined">settings</span><span>설정</span></a>
+      <a href="dashboard.html"><span class="material-symbols-outlined" aria-hidden="true">dashboard</span><span>대시보드</span></a>
+      <a href="sentence.html"><span class="material-symbols-outlined" aria-hidden="true">menu_book</span><span>문장 학습</span></a>
+      <a href="mypage.html"><span class="material-symbols-outlined" aria-hidden="true">insights</span><span>학업 성취도</span></a>
+      <a href="settings.html" aria-current="page"><span class="material-symbols-outlined" aria-hidden="true">settings</span><span>설정</span></a>
     </nav>
     <div class="slide-menu-footer">
-      <a class="btn btn-ghost" id="btn-logout" href="#">로그아웃</a>
+      <button class="btn btn-ghost" data-logout type="button">로그아웃</button>
     </div>
   </aside>
+  <script src="core.js"></script>
   <script src="data-loader.js"></script>
   <script src="app.js"></script>
 </body>
