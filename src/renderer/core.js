@@ -546,7 +546,10 @@
   // 긴 어미·조사부터 한 번만 떼어 낸다.
   const KO_ENDINGS = [
     "입니다", "합니다", "습니다", "있어요", "에서는", "에서", "으로", "해요", "이다",
+    // 해요체·합니다체·해라체 차이는 같은 뜻으로 본다(느꼈습니다 = 느꼈어요 = 느꼈다).
+    "어요", "아요", "예요", "에요", "세요", "니다",
     "에게", "까지", "부터", "은", "는", "이", "가", "을", "를", "에", "로", "와", "과", "도", "의",
+    "요", "다",
   ];
 
   // 같은 뜻으로 인정하는 낱말 (작은 의역 사전)
@@ -559,6 +562,10 @@
     "제": "내",
     "저희": "우리",
     "식탁위": "식탁",
+    "테이블": "식탁",
+    "주방": "부엌",
+    "드디어": "마침내",
+    "후": "뒤",
   };
 
   function stripKoreanEnding(token) {
@@ -617,11 +624,76 @@
     return userCount > limit ? limit / userCount : 1;
   }
 
+  /*
+   * 문장 형태 보정: 핵심어만 나열하거나 조사·어미를 떼어 낸 전보식 답은 뜻이 맞아도 문장이 아니다.
+   * - 모범 답안에서 조사가 붙은 낱말을 답안에서 맨 낱말로만 썼다면 그 비율만큼 깎는다(최대 45%).
+   * - 답안이 제시된 핵심어를 이어 붙인 것뿐이면(핵심어 밖 글자가 20% 미만) 최저 비율을 적용한다.
+   */
+  const FORM_FLOOR = 0.55;
+
+  function formFactor(consideredCount, keptCount) {
+    if (consideredCount < 2) return 1;
+    const needed = Math.ceil(consideredCount / 2);
+    return FORM_FLOOR + (1 - FORM_FLOOR) * Math.min(1, keptCount / needed);
+  }
+
+  function cleanKoreanSurface(token) {
+    return String(token || "").toLowerCase().replace(/^[^0-9a-z가-힣]+|[^0-9a-z가-힣]+$/g, "");
+  }
+
+  // 형태 보정은 조사만 본다(서술어 어미는 문체 차이라서 제외).
+  const KO_PARTICLES = [
+    "에서는", "에서", "으로", "에게", "까지", "부터",
+    "은", "는", "이", "가", "을", "를", "에", "로", "와", "과", "도", "의",
+  ];
+
+  function stripKoreanParticle(token) {
+    const particle = KO_PARTICLES.find((item) => token.length > item.length && token.endsWith(item));
+    return particle ? token.slice(0, -particle.length) : token;
+  }
+
+  function koreanParticleFactor(userAnswer, answer) {
+    const userSurfaces = String(userAnswer || "").split(/\s+/).map(cleanKoreanSurface).filter(Boolean);
+    let considered = 0;
+    let kept = 0;
+    String(answer || "").split(/\s+/).map(cleanKoreanSurface).filter(Boolean).forEach((surface) => {
+      const stem = stripKoreanParticle(surface);
+      if (stem === surface) return; // 조사·어미가 없는 낱말
+      if (userSurfaces.includes(stem)) {
+        considered += 1; // 같은 낱말을 조사 없이 씀
+      } else if (userSurfaces.some((user) => user.length > stem.length && user.startsWith(stem))) {
+        considered += 1;
+        kept += 1; // 조사·어미를 붙여 씀(다른 조사여도 인정)
+      }
+    });
+    return formFactor(considered, kept);
+  }
+
+  function isKeywordListing(userAnswer, keywords) {
+    const compact = String(userAnswer || "").replace(/[^0-9a-zA-Z가-힣]/g, "");
+    if (!compact || !Array.isArray(keywords) || !keywords.length) return false;
+    let rest = compact;
+    keywords
+      .map((keyword) => String(keyword || "").replace(/[^0-9a-zA-Z가-힣]/g, ""))
+      .filter(Boolean)
+      .sort((a, b) => b.length - a.length)
+      .forEach((keyword) => {
+        rest = rest.split(keyword).join("");
+      });
+    return rest.length / compact.length < 0.2;
+  }
+
+  function koreanFormFactor(userAnswer, answer, keywords) {
+    const factor = koreanParticleFactor(userAnswer, answer);
+    return isKeywordListing(userAnswer, keywords) ? Math.min(factor, FORM_FLOOR) : factor;
+  }
+
   function scoreKoreanAgainst(userAnswer, answer, keywords) {
     const expected = tokenizeKorean(answer);
     const user = tokenizeKorean(userAnswer);
     if (!expected.length || !user.length) return 0;
-    if (expected.join("") === user.join("")) return 100;
+    const form = koreanFormFactor(userAnswer, answer, keywords);
+    if (expected.join("") === user.join("")) return Math.round(100 * form);
 
     const matched = matchTokens(expected, user);
     const recall = matched / expected.length;
@@ -636,7 +708,7 @@
     const keywordRatio = keywordList.length ? keywordHits / keywordList.length : recall;
 
     const raw = (keywordRatio * 35) + (recall * 45) + (precision * 20);
-    return Math.max(0, Math.min(100, Math.round(raw * lengthPenalty(expected.length, user.length))));
+    return Math.max(0, Math.min(100, Math.round(raw * lengthPenalty(expected.length, user.length) * form)));
   }
 
   /** 영→한 해석 채점. data.answer 와 data.answers[] 중 가장 높은 점수 */
@@ -659,6 +731,31 @@
       .trim();
   }
 
+  // 관사·전치사·대명사·be동사: 내용어만 나열한 영작을 걸러 내는 데 쓴다.
+  const EN_FUNCTION_WORDS = new Set([
+    "a", "an", "the", "to", "for", "on", "in", "at", "of", "by", "with", "from", "into", "about",
+    "is", "are", "was", "were", "be", "been", "am",
+    "i", "we", "you", "he", "she", "they", "it", "my", "our", "your", "his", "her", "their", "its", "me", "us", "him", "them",
+  ]);
+
+  function countFunctionWordMatches(expectedTokens, userTokens) {
+    const remaining = new Map();
+    userTokens.forEach((token) => {
+      if (EN_FUNCTION_WORDS.has(token)) remaining.set(token, (remaining.get(token) || 0) + 1);
+    });
+    let expectedCount = 0;
+    let matched = 0;
+    expectedTokens.forEach((token) => {
+      if (!EN_FUNCTION_WORDS.has(token)) return;
+      expectedCount += 1;
+      if (remaining.get(token) > 0) {
+        matched += 1;
+        remaining.set(token, remaining.get(token) - 1);
+      }
+    });
+    return { expectedCount, matched };
+  }
+
   function scoreEnglishAgainst(userAnswer, correctAnswer) {
     const user = normalizeEnglish(userAnswer);
     const correct = normalizeEnglish(correctAnswer);
@@ -671,7 +768,35 @@
     const matched = matchTokens(expectedTokens, userTokens);
     const recall = matched / expectedTokens.length;
     const raw = (similarity * 55) + (recall * 45);
-    return Math.max(0, Math.min(100, Math.round(raw * lengthPenalty(expectedTokens.length, userTokens.length))));
+    const functionWords = countFunctionWordMatches(expectedTokens, userTokens);
+    const form = formFactor(functionWords.expectedCount, functionWords.matched);
+    return Math.max(0, Math.min(100, Math.round(raw * lengthPenalty(expectedTokens.length, userTokens.length) * form)));
+  }
+
+  /** 영→한 답안이 문장 형태 때문에 감점됐다면 이유 문구, 아니면 "" */
+  function getKoreanFormHint(userAnswer, data) {
+    if (!String(userAnswer || "").trim() || !data) return "";
+    if (isKeywordListing(userAnswer, data.keywords)) {
+      return "핵심어만 나열한 답은 문장으로 보지 않아 감점했습니다. 조사와 어미를 붙여 문장으로 써 보세요.";
+    }
+    const answers = [data.answer].concat(Array.isArray(data.answers) ? data.answers : [])
+      .filter((answer) => typeof answer === "string" && answer.trim());
+    const best = answers.reduce((max, answer) => Math.max(max, koreanParticleFactor(userAnswer, answer)), 0);
+    return best < 1 ? "조사(은·는·을·를·에 등)가 빠져 감점했습니다." : "";
+  }
+
+  /** 한→영 답안이 관사·전치사 등이 빠져 감점됐다면 이유 문구, 아니면 "" */
+  function getEnglishFormHint(userAnswer, data) {
+    const source = typeof data === "string" ? { english: data } : (data || {});
+    const user = normalizeEnglish(userAnswer);
+    if (!user) return "";
+    const answers = [source.english].concat(Array.isArray(source.englishAlternatives) ? source.englishAlternatives : [])
+      .filter((answer) => typeof answer === "string" && answer.trim());
+    const best = answers.reduce((max, answer) => {
+      const fw = countFunctionWordMatches(normalizeEnglish(answer).split(" "), user.split(" "));
+      return Math.max(max, formFactor(fw.expectedCount, fw.matched));
+    }, 0);
+    return best < 1 ? "관사·전치사·대명사(a, the, on, my 등)가 빠져 감점했습니다." : "";
   }
 
   /** 한→영 작문 채점. data.english 와 data.englishAlternatives[] 중 최고점 */
@@ -726,5 +851,7 @@
     tokenizeKorean,
     scoreKoreanTranslation,
     scoreEnglishSentence,
+    getKoreanFormHint,
+    getEnglishFormHint,
   };
 });

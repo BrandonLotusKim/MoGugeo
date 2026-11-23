@@ -70,6 +70,25 @@ export function buildDailyPopupTaskXml(executable: string, time: string, today: 
   ].join("\r\n");
 }
 
+/**
+ * 콘솔 프로그램 출력 디코딩: UTF-8 로 읽어 깨지면(대체 문자 발생) CP949(EUC-KR) 로 다시 읽는다.
+ * `schtasks /query /xml` 은 UTF-16 LE 로 나올 수 있어 BOM 도 확인한다.
+ */
+export function decodeConsoleOutput(output: Uint8Array | string | null | undefined): string {
+  if (output === null || output === undefined) return "";
+  if (typeof output === "string") return output;
+  if (output.length >= 2 && output[0] === 0xff && output[1] === 0xfe) {
+    return new TextDecoder("utf-16le").decode(output.subarray(2));
+  }
+  const utf8 = new TextDecoder("utf-8").decode(output);
+  if (!utf8.includes("�")) return utf8;
+  try {
+    return new TextDecoder("euc-kr").decode(output);
+  } catch {
+    return utf8;
+  }
+}
+
 /** `schtasks /query /xml` 출력에서 HH:MM 추출 */
 export function parseTaskTime(xml: string): string | null {
   const match = xml.match(/<StartBoundary>[^<]*T(\d{2}:\d{2}):\d{2}[^<]*<\/StartBoundary>/);

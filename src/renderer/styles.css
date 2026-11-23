@@ -80,6 +80,9 @@ body {
     linear-gradient(180deg, color-mix(in srgb, var(--bg-primary) 72%, white) 0%, color-mix(in srgb, var(--bg-primary) 88%, white) 45%, var(--bg-surface-soft) 100%);
   color: var(--text-primary);
   font-family: "Inter", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+  /* 한국어는 어절 단위로 줄을 바꾼다(단어 중간 끊김 방지). 아주 긴 영문·URL 만 강제로 나눈다. */
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 
 a {
@@ -401,7 +404,8 @@ body.dark .app-titlebar {
 }
 
 .hero-title {
-  font-size: clamp(36px, 3.6vw, 58px);
+  /* 본문 폭이 1200px 로 고정되므로 넓은 창에서도 글자가 더 커지지 않게 상한을 둔다. */
+  font-size: clamp(36px, 3.6vw, 46px);
   line-height: 0.98;
   color: var(--text-primary);
 }
@@ -551,6 +555,19 @@ body.dark .app-titlebar {
   color: var(--text-strong);
   font-size: 15px;
   font-weight: 800;
+}
+
+/* 버튼으로 쓴 링크형 동작(복습 노트 삭제 등): 기본 회색 버튼 배경 제거 */
+button.link-action {
+  flex-shrink: 0;
+  padding: 6px 4px;
+  background: none;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+button.link-action:hover {
+  text-decoration: underline;
 }
 
 .dual-grid {
@@ -1071,11 +1088,15 @@ body.dark .app-titlebar {
   z-index: 1000;
   display: flex;
   flex-direction: column;
-  transition: right 0.25s ease;
+  /* 닫혀 있을 때는 화면 밖 링크가 Tab 포커스를 받지 않게 숨긴다. */
+  visibility: hidden;
+  transition: right 0.25s ease, visibility 0s linear 0.25s;
 }
 
 .slide-menu.open {
   right: 0;
+  visibility: visible;
+  transition: right 0.25s ease, visibility 0s;
 }
 
 .slide-menu-header {
@@ -1450,31 +1471,48 @@ select.text-input {
     linear-gradient(180deg, color-mix(in srgb, var(--bg-primary) 78%, white) 0%, var(--bg-surface-soft) 100%);
 }
 
+/* 타이틀바 아래 남은 높이 안에서 스크롤. 창이 낮아도 이전/시작하기 버튼에 닿을 수 있다. */
 .onboarding-page {
-  display: grid;
-  place-items: center;
-  min-height: calc(100vh - 32px);
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  max-width: none;
+  overflow-y: auto;
 }
 
 .onboarding-surface {
   width: min(100%, 760px);
+  margin: auto;
   display: grid;
-  gap: 28px;
-  padding: 36px;
+  gap: 20px;
+  padding: 30px 34px;
   background: color-mix(in srgb, var(--bg-surface) 92%, white);
   box-shadow: var(--shadow);
 }
 
 .onboarding-header {
   display: grid;
-  gap: 12px;
+  gap: 10px;
+}
+
+.onboarding-header .eyebrow {
+  justify-self: start;
+}
+
+.onboarding-header .hero-title {
+  font-size: clamp(30px, 3vw, 40px);
+  line-height: 1.12;
+}
+
+.onboarding-header .hero-copy {
+  margin: 0;
 }
 
 .onboarding-step {
   display: none;
-  gap: 14px;
-  min-height: 280px;
-  padding: 30px;
+  gap: 12px;
+  min-height: 250px;
+  padding: 26px 30px;
   border-radius: var(--radius-lg);
   background: linear-gradient(135deg, color-mix(in srgb, var(--bg-secondary) 74%, white) 0%, var(--bg-surface) 100%);
 }
@@ -1770,6 +1808,8 @@ select.text-input {
 
 /* ==================== 다크 모드 ==================== */
 body.dark {
+  /* 시간 입력 시계 아이콘·선택 상자 화살표 등 기본 컨트롤도 어두운 색으로 */
+  color-scheme: dark;
   --bg-primary: #131520;
   --bg-secondary: #1a1d2e;
   --bg-surface: #1e2235;
@@ -2422,6 +2462,11 @@ body.dark .result-line.fail {
   background: #847000;
 }
 
+/* 다크 모드에서도 오늘 막대를 구분한다 */
+body.dark .chart-value.today {
+  background: var(--gold);
+}
+
 .heatmap {
   grid-template-columns: none;
   grid-template-rows: repeat(7, auto);
@@ -2541,4 +2586,10 @@ body.dark .popup-message.error {
 input[type="checkbox"],
 input[type="radio"] {
   accent-color: var(--accent);
+}
+
+/* 채점 감점 이유 (핵심어 나열·조사 누락 등) */
+.result-hint {
+  margin: 4px 0 0;
+  font-weight: 700;
 }

@@ -26,6 +26,25 @@ function saveState(state) {
   localStorage.setItem(STATE_KEY, JSON.stringify(state));
 }
 
+/**
+ * 저장 직전에 최신 상태를 다시 읽어 바꾼다.
+ * 메인 창과 데일리 팝업 창이 같은 저장소를 쓰므로, 화면을 열 때 읽어 둔 상태를 그대로 저장하면
+ * 그사이 다른 창이 저장한 기록이 지워진다.
+ */
+function updateState(mutate) {
+  const state = getState();
+  const result = mutate(state);
+  saveState(state);
+  return { state, result };
+}
+
+/** 다른 창이 상태를 바꿨을 때 알림 (같은 창의 저장에는 오지 않는다) */
+function onStateChangedElsewhere(handler) {
+  window.addEventListener("storage", (event) => {
+    if (event.key === STATE_KEY || event.key === null) handler(getState());
+  });
+}
+
 function getSentences() {
   return window.MoGugeoData?.sentences || [];
 }
@@ -81,10 +100,15 @@ function formatTimeLabel(time) {
   return `${period} ${displayHour}:${String(minute).padStart(2, "0")}`;
 }
 
+/** 오류 문구를 넣을 곳: 필드를 감싼 .field/.check-row (선택지 그리드 안에 넣으면 칸 하나 폭으로 좁아진다) */
+function getErrorHolder(field) {
+  return field.closest(".field, .check-row") || field.parentElement;
+}
+
 /** 필드 아래 오류 문구 표시 (색 + 문구 + aria) */
 function setFieldError(field, message) {
   if (!field) return;
-  const holder = field.closest(".field, .check-row, .choice-group") || field.parentElement;
+  const holder = getErrorHolder(field);
   const id = `${field.id || field.name || "field"}-error`;
   let error = holder.querySelector(`#${CSS.escape(id)}`);
   if (!error) {
@@ -100,7 +124,7 @@ function setFieldError(field, message) {
 
 function clearFieldError(field) {
   if (!field) return;
-  const holder = field.closest(".field, .check-row, .choice-group") || field.parentElement;
+  const holder = getErrorHolder(field);
   const id = `${field.id || field.name || "field"}-error`;
   const error = holder.querySelector(`#${CSS.escape(id)}`);
   if (error) error.hidden = true;
@@ -433,7 +457,12 @@ function initDashboard() {
     return;
   }
   syncOsSettingsOnce(state);
+  renderDashboard(state);
+  // 데일리 팝업 창에서 문제를 풀면 대시보드 숫자도 바로 바뀐다.
+  onStateChangedElsewhere(renderDashboard);
+}
 
+function renderDashboard(state) {
   const now = new Date();
   const today = Core.getTodaySummary(state.studyLog, now);
   const streak = Core.computeStreak(state.studyLog, now);
@@ -442,6 +471,7 @@ function initDashboard() {
   const greeting = hour < 12 ? "좋은 아침입니다" : hour < 18 ? "좋은 오후입니다" : "좋은 저녁입니다";
 
   $("#dash-greeting").textContent = `${greeting}, ${getNickname(state)}님.`;
+  renderProfileName(state);
   $("#dash-hero-copy").textContent = state.studyLog.length === 0
     ? "아직 학습 기록이 없습니다. 첫 문장을 풀어 보세요."
     : today.total >= today.goal
@@ -526,7 +556,7 @@ function initSentence() {
   const textEl = $("#sentence-text");
   if (!textEl) return;
 
-  const state = getState();
+  let state = getState();
   if (!requireProfile(state)) return;
 
   const sentences = getSentences();
@@ -534,6 +564,7 @@ function initSentence() {
   let mode = params.get("mode") === "review" ? "review" : "new";
   let repeat = false;
   const answeredThisSession = new Set();
+  const skippedThisSession = new Set();
   let current = null;
   let answered = false;
 
@@ -559,14 +590,43 @@ function initSentence() {
     reviewBtn.disabled = queued;
   }
 
+  function seenThisSession() {
+    return new Set([...answeredThisSession, ...skippedThisSession]);
+  }
+
   function pick() {
+    const now = new Date();
+    const seen = seenThisSession();
+    if (mode === "review") {
+      return Core.getDueSentences(state, sentences, now)
+        .find((sentence) => !seen.has(Core.getSentenceId(sentence))) || null;
+    }
+    if (repeat) return Core.pickRepeatSentence(state, sentences, seen);
+    return Core.pickNextNewSentence(state, sentences, seen);
+  }
+
+  /** 건너뛴 문장 중 아직 풀 차례인 것(복습: 오늘 도래, 새 문장: 아직 안 푼 것, 다시 풀기: 이번에 안 푼 것) */
+  function countSkippedLeft() {
     const now = new Date();
     if (mode === "review") {
       return Core.getDueSentences(state, sentences, now)
-        .find((sentence) => !answeredThisSession.has(Core.getSentenceId(sentence))) || null;
+        .filter((sentence) => skippedThisSession.has(Core.getSentenceId(sentence))).length;
     }
-    if (repeat) return Core.pickRepeatSentence(state, sentences, answeredThisSession);
-    return Core.pickNextNewSentence(state, sentences, answeredThisSession);
+    if (repeat) {
+      return Core.getSentencesForDifficulty(sentences, state.settings.difficulty)
+        .filter((sentence) => skippedThisSession.has(Core.getSentenceId(sentence))
+          && !answeredThisSession.has(Core.getSentenceId(sentence))).length;
+    }
+    const studied = new Set(state.studyLog.map((entry) => entry.contentId));
+    return Core.getSentencesForDifficulty(sentences, state.settings.difficulty)
+      .filter((sentence) => skippedThisSession.has(Core.getSentenceId(sentence))
+        && !studied.has(Core.getSentenceId(sentence))).length;
+  }
+
+  function actionButton(text, className, onClick) {
+    const button = el("button", { className: `btn ${className}`, text, attrs: { type: "button" } });
+    button.addEventListener("click", onClick);
+    return button;
   }
 
   function showExhausted() {
@@ -577,15 +637,34 @@ function initSentence() {
     nextBtn.hidden = true;
     exhausted.hidden = false;
     const dueCount = Core.getDueReviewItems(state, new Date()).length;
+    const skippedLeft = countSkippedLeft();
     const title = $("#exhausted-title");
     const copy = $("#exhausted-copy");
     const actions = $("#exhausted-actions");
     actions.replaceChildren();
 
+    const retrySkipped = actionButton("건너뛴 문장 다시 보기", "btn-primary", () => {
+      skippedThisSession.clear();
+      load();
+      if (current) textarea.focus();
+    });
+
     if (mode === "review") {
-      title.textContent = "오늘 복습할 문장을 모두 봤습니다.";
-      copy.textContent = "다음 복습일이 된 문장은 대시보드와 데일리 팝업에 다시 나옵니다.";
-      actions.append(el("a", { className: "btn btn-primary", text: "새 문장 학습", attrs: { href: "sentence.html" } }));
+      if (skippedLeft) {
+        title.textContent = `건너뛴 복습 문장 ${skippedLeft}개가 남았습니다.`;
+        copy.textContent = "지금 다시 보거나, 나중에 대시보드의 복습 버튼으로 이어서 풀 수 있습니다.";
+        actions.append(retrySkipped);
+        actions.append(el("a", { className: "btn btn-ghost", text: "대시보드로", attrs: { href: "dashboard.html" } }));
+      } else {
+        title.textContent = "오늘 복습할 문장을 모두 봤습니다.";
+        copy.textContent = "다음 복습일이 된 문장은 대시보드와 데일리 팝업에 다시 나옵니다.";
+        actions.append(el("a", { className: "btn btn-primary", text: "새 문장 학습", attrs: { href: "sentence.html" } }));
+      }
+    } else if (skippedLeft) {
+      title.textContent = `건너뛴 문장 ${skippedLeft}개가 남았습니다.`;
+      copy.textContent = "건너뛴 문장은 기록되지 않습니다. 지금 다시 보거나 설정에서 난이도를 바꿀 수 있습니다.";
+      actions.append(retrySkipped);
+      actions.append(el("a", { className: "btn btn-ghost", text: "난이도 바꾸기", attrs: { href: "settings.html#difficulty" } }));
     } else {
       const total = Core.getSentencesForDifficulty(sentences, state.settings.difficulty).length;
       const label = Core.getDifficultyLabel(state.settings.difficulty);
@@ -594,13 +673,14 @@ function initSentence() {
         : `${label} 난이도 문장이 없습니다.`;
       copy.textContent = "오래전에 푼 문장부터 다시 풀거나, 설정에서 난이도를 바꿀 수 있습니다.";
       if (total) {
-        const again = el("button", { className: "btn btn-primary", text: "다시 풀기", attrs: { type: "button" } });
-        again.addEventListener("click", () => {
+        actions.append(actionButton("다시 풀기", "btn-primary", () => {
+          // 다시 풀기는 이번 세션에 본 문장도 다시 후보로 넣는다.
           repeat = true;
-          exhausted.hidden = true;
+          answeredThisSession.clear();
+          skippedThisSession.clear();
           load();
-        });
-        actions.append(again);
+          if (current) textarea.focus();
+        }));
       }
       actions.append(el("a", { className: "btn btn-ghost", text: "난이도 바꾸기", attrs: { href: "settings.html#difficulty" } }));
       if (dueCount) {
@@ -654,15 +734,16 @@ function initSentence() {
     }
     answered = true;
     const score = Core.scoreKoreanTranslation(answer, current);
-    const result = Core.submitAnswer(state, {
+    const update = updateState((latest) => Core.submitAnswer(latest, {
       contentId: Core.getSentenceId(current),
       direction: "en-to-ko",
       score,
       source: mode === "review" ? "review" : "sentence",
       now: new Date(),
-    });
+    }));
+    state = update.state;
+    const result = update.result;
     answeredThisSession.add(Core.getSentenceId(current));
-    saveState(state);
     textarea.disabled = true;
     checkBtn.disabled = true;
     renderFeedback(current, answer, result);
@@ -682,15 +763,23 @@ function initSentence() {
   nextBtn.addEventListener("click", () => {
     if (!answered && current) {
       // 풀지 않고 넘기면 이번 세션에서만 건너뛴다(기록하지 않음).
-      answeredThisSession.add(Core.getSentenceId(current));
+      skippedThisSession.add(Core.getSentenceId(current));
     }
     load();
-    textarea.focus();
+    if (current) textarea.focus();
   });
 
   reviewBtn.addEventListener("click", () => {
     if (!current) return;
-    if (Core.addReviewItem(state, Core.getSentenceId(current), new Date())) saveState(state);
+    const contentId = Core.getSentenceId(current);
+    state = updateState((latest) => Core.addReviewItem(latest, contentId, new Date())).state;
+    syncReviewButton();
+  });
+
+  // 데일리 팝업 등 다른 창에서 저장하면 진행도와 복습 노트 상태를 맞춘다.
+  onStateChangedElsewhere((latest) => {
+    state = latest;
+    renderProgress();
     syncReviewButton();
   });
 
@@ -704,12 +793,14 @@ function renderFeedback(sentence, userAnswer, result) {
   feedback.hidden = false;
 
   const banner = $("#sentence-result");
+  const hint = Core.getKoreanFormHint(userAnswer, sentence);
   banner.className = `result-banner ${result.isCorrect ? "pass" : "fail"}`;
   banner.replaceChildren(
     icon(result.isCorrect ? "check_circle" : "cancel"),
     el("div", {}, [
       el("strong", { className: "result-title", text: result.isCorrect ? "정답입니다" : "다시 볼 문장입니다" }),
       el("p", { className: "result-copy", text: getReviewMessage(result, sentence) }),
+      hint ? el("p", { className: "result-copy result-hint", text: hint }) : null,
     ]),
     el("span", { className: "result-score", text: `${result.score}점` }),
   );
@@ -737,22 +828,66 @@ function getReviewMessage(result, sentence) {
   }
 }
 
-function speakText(text, lang = "en-US") {
+/** 브라우저 음성 목록 (처음에는 비어 있다가 voiceschanged 뒤에 채워질 수 있다) */
+function loadBrowserVoices(timeoutMs = 800) {
+  if (!window.speechSynthesis) return Promise.resolve([]);
+  const voices = window.speechSynthesis.getVoices();
+  if (voices.length) return Promise.resolve(voices);
+  return new Promise((resolve) => {
+    const done = () => resolve(window.speechSynthesis.getVoices());
+    window.speechSynthesis.addEventListener("voiceschanged", done, { once: true });
+    setTimeout(done, timeoutMs);
+  });
+}
+
+/**
+ * 영어 문장 읽기.
+ * 1) 브라우저 음성 중 영어 음성이 있으면 그것으로 읽는다.
+ * 2) 없으면(Windows 에 따라 한국어 음성만 보이는 경우가 있다) 앱이 Windows 음성(SAPI)의 영어 음성으로 읽는다.
+ * 영어 음성이 아예 없으면 한국어 음성으로 영어를 읽지 않고 설치 방법을 안내한다.
+ */
+async function speakText(text, lang = "en-US") {
   const content = String(text || "").trim();
   const status = $("#audio-status");
+  const setStatus = (message) => {
+    if (status) status.textContent = message;
+  };
   if (!content) return;
-  if (!window.speechSynthesis || typeof window.SpeechSynthesisUtterance === "undefined") {
-    if (status) status.textContent = "이 PC에서는 음성 재생을 쓸 수 없습니다.";
+
+  const voices = await loadBrowserVoices();
+  const englishVoice = voices.find((voice) => voice.lang === lang)
+    || voices.find((voice) => /^en(-|_|$)/i.test(voice.lang));
+
+  if (englishVoice && typeof window.SpeechSynthesisUtterance !== "undefined") {
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(content);
+    utterance.lang = englishVoice.lang;
+    utterance.voice = englishVoice;
+    utterance.onerror = (event) => {
+      if (event.error !== "canceled" && event.error !== "interrupted") {
+        setStatus("음성을 재생하지 못했습니다. 잠시 뒤 다시 눌러 보세요.");
+      }
+    };
+    setStatus("");
+    window.speechSynthesis.speak(utterance);
     return;
   }
-  window.speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(content);
-  utterance.lang = lang;
-  utterance.onerror = () => {
-    if (status) status.textContent = "음성을 재생하지 못했습니다. Windows 설정에서 영어 음성을 설치했는지 확인하세요.";
-  };
-  if (status) status.textContent = "";
-  window.speechSynthesis.speak(utterance);
+
+  if (window.mogugeo?.speakEnglish) {
+    window.speechSynthesis?.cancel();
+    setStatus("Windows 영어 음성으로 읽는 중입니다.");
+    const result = await window.mogugeo.speakEnglish(content);
+    if (result?.ok) {
+      setStatus("");
+    } else if (result?.reason === "no-english-voice") {
+      setStatus("이 PC에 영어 음성이 없습니다. Windows 설정 > 시간 및 언어 > 음성에서 영어 음성을 추가하세요.");
+    } else if (result?.reason !== "canceled") {
+      setStatus("음성을 재생하지 못했습니다. 잠시 뒤 다시 눌러 보세요.");
+    }
+    return;
+  }
+
+  setStatus("이 PC에 영어 음성이 없습니다. Windows 설정 > 시간 및 언어 > 음성에서 영어 음성을 추가하세요.");
 }
 
 /* ---------- 학업 성취도 (마이페이지) ---------- */
@@ -761,7 +896,26 @@ function initMyPage() {
   if (!$("#profile-name")) return;
   const state = getState();
   if (!requireProfile(state)) return;
+  renderMyPage(state);
+  onStateChangedElsewhere(renderMyPage);
+
+  const darkToggle = $("#dark-mode-toggle");
+  if (darkToggle) {
+    setSwitchState(darkToggle, state.darkMode);
+    darkToggle.addEventListener("switch-change", (event) => {
+      const { state: latest } = updateState((draft) => {
+        draft.darkMode = event.detail.on;
+      });
+      applyDarkMode(latest.darkMode);
+    });
+  }
+}
+
+function renderMyPage(state) {
   const now = new Date();
+  renderProfileName(state);
+  applyDarkMode(state.darkMode);
+  setSwitchState($("#dark-mode-toggle"), state.darkMode);
 
   $("#profile-name").textContent = `반가워요, ${getNickname(state)}님.`;
   $("#profile-avatar-initial").textContent = getNickname(state).slice(0, 1).toUpperCase();
@@ -776,17 +930,6 @@ function initMyPage() {
   $("#account-nickname").textContent = getNickname(state);
   $("#account-difficulty").textContent = Core.getDifficultyLabel(state.settings.difficulty);
   $("#account-created").textContent = state.profile?.createdAt ? formatDate(state.profile.createdAt) : "-";
-
-  const darkToggle = $("#dark-mode-toggle");
-  if (darkToggle) {
-    setSwitchState(darkToggle, state.darkMode);
-    darkToggle.addEventListener("switch-change", (event) => {
-      const latest = getState();
-      latest.darkMode = event.detail.on;
-      applyDarkMode(latest.darkMode);
-      saveState(latest);
-    });
-  }
 }
 
 function renderAccuracyChart(state, now) {
@@ -833,12 +976,13 @@ function renderHeatmap(state, now) {
   heatmap.setAttribute("aria-label", `최근 12주 동안 ${Core.countStudyDays(state.studyLog)}일 학습`);
 }
 
-function renderReviewNote(state) {
+function renderReviewNote(initialState) {
   const container = $("#review-list-container");
   if (!container) return;
   const countEl = $("#review-list-count");
   const startBtn = $("#review-start-btn");
   const sentenceMap = getSentenceMap();
+  let state = initialState;
 
   function render() {
     const now = new Date();
@@ -858,11 +1002,12 @@ function renderReviewNote(state) {
     items.forEach((item) => {
       const sentence = sentenceMap.get(item.contentId);
       const interval = Core.REVIEW_INTERVAL_DAYS[item.level];
-      const meta = `${item.level + 1}단계(${interval}일 간격) · 다음 복습 ${formatDate(item.nextReviewAt)}`;
+      const isDue = dueIds.has(item.contentId);
+      // 도래한 항목은 지난 날짜 대신 "오늘 복습"으로 보여 준다.
+      const meta = `${item.level + 1}단계(${interval}일 간격) · ${isDue ? "오늘 복습할 차례" : `다음 복습 ${formatDate(item.nextReviewAt)}`}`;
       const removeBtn = el("button", { className: "link-action", text: "삭제", attrs: { type: "button", "aria-label": `${sentence?.english || item.contentId} 복습 노트에서 삭제` } });
       removeBtn.addEventListener("click", () => {
-        Core.removeReviewItem(state, item.contentId);
-        saveState(state);
+        state = updateState((latest) => Core.removeReviewItem(latest, item.contentId)).state;
         render();
       });
       list.append(el("div", { className: "list-item" }, [
@@ -870,7 +1015,7 @@ function renderReviewNote(state) {
           el("strong", { text: sentence?.english || item.contentId }),
           el("p", { className: "fine-copy small", text: meta }),
         ]),
-        dueIds.has(item.contentId) ? el("span", { className: "chip gold", text: "오늘" }) : null,
+        isDue ? el("span", { className: "chip gold", text: "오늘" }) : null,
         removeBtn,
       ]));
     });
@@ -885,8 +1030,13 @@ function renderReviewNote(state) {
 async function initSettings() {
   const timeInput = $("#popup-time");
   if (!timeInput) return;
-  const state = getState();
+  let state = getState();
   if (!requireProfile(state)) return;
+
+  /** 최신 상태에 변경을 적용해 저장 (팝업 창에서 저장한 기록을 덮어쓰지 않게) */
+  function commit(mutate) {
+    state = updateState(mutate).state;
+  }
 
   const diffSelect = $("#difficulty");
   const dailyPopupToggle = $("#daily-popup-toggle");
@@ -956,40 +1106,53 @@ async function initSettings() {
       return;
     }
     clearFieldError(timeInput);
-    state.settings.popupTime = timeInput.value;
-    saveState(state);
+    commit((draft) => {
+      draft.settings.popupTime = timeInput.value;
+    });
     await applyDailyPopup();
+  });
+  // 잘못 지운 채로 벗어나면 저장된 시각으로 되돌린다.
+  timeInput.addEventListener("blur", () => {
+    if (!Core.TIME_PATTERN.test(timeInput.value)) {
+      timeInput.value = state.settings.popupTime;
+      clearFieldError(timeInput);
+    }
   });
 
   diffSelect?.addEventListener("change", () => {
-    state.settings.difficulty = Core.normalizeDifficulty(diffSelect.value);
-    saveState(state);
+    commit((draft) => {
+      draft.settings.difficulty = Core.normalizeDifficulty(diffSelect.value);
+    });
     renderSummary();
   });
 
   dailyPopupToggle?.addEventListener("switch-change", async (event) => {
-    state.settings.dailyPopupEnabled = event.detail.on;
-    saveState(state);
+    commit((draft) => {
+      draft.settings.dailyPopupEnabled = event.detail.on;
+    });
     await applyDailyPopup();
   });
 
   autoStartToggle?.addEventListener("switch-change", async (event) => {
-    state.settings.autoStart = event.detail.on;
-    saveState(state);
+    commit((draft) => {
+      draft.settings.autoStart = event.detail.on;
+    });
     const result = await window.mogugeo?.setAutoStart?.(state.settings.autoStart);
     renderSummary(result);
   });
 
   autoLoginToggle?.addEventListener("switch-change", (event) => {
-    state.settings.autoLogin = event.detail.on;
-    saveState(state);
+    commit((draft) => {
+      draft.settings.autoLogin = event.detail.on;
+    });
     renderSummary();
   });
 
   darkToggle?.addEventListener("switch-change", (event) => {
-    state.darkMode = event.detail.on;
+    commit((draft) => {
+      draft.darkMode = event.detail.on;
+    });
     applyDarkMode(state.darkMode);
-    saveState(state);
   });
 
   nicknameSave?.addEventListener("click", () => {
@@ -1001,8 +1164,9 @@ async function initSettings() {
       return;
     }
     clearFieldError(nicknameInput);
-    state.profile.nickname = nicknameInput.value.trim();
-    saveState(state);
+    commit((draft) => {
+      if (draft.profile) draft.profile.nickname = nicknameInput.value.trim();
+    });
     renderProfileName(state);
     if (status) status.textContent = "저장했습니다.";
   });
@@ -1056,6 +1220,7 @@ function initPopup() {
           el("span", { text: `과제 ${index + 1} · ${item.isCorrect ? "정답" : "복습 필요"}` }),
         ]),
         el("p", { className: "small muted", text: `모범 답안: ${item.correctAnswer || "-"}` }),
+        item.hint ? el("p", { className: "small result-hint", text: item.hint }) : null,
       ]),
       el("span", { className: "chip", text: `${item.score}점` }),
     ])));
@@ -1148,6 +1313,9 @@ function initPopup() {
         score: outcome.score,
         isCorrect: outcome.isCorrect,
         correctAnswer: task.direction === "en-to-ko" ? task.sentence.answer : task.sentence.english,
+        hint: task.direction === "en-to-ko"
+          ? Core.getKoreanFormHint(task.input.value, task.sentence)
+          : Core.getEnglishFormHint(task.input.value, task.sentence),
       };
     });
     latest.lastPopupDate = today;

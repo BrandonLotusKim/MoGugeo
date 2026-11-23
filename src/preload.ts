@@ -16,4 +16,5 @@ contextBridge.exposeInMainWorld("mogugeo", {
   shrinkWindow: () => ipcRenderer.invoke("shrink-window"),
   showMain: () => ipcRenderer.invoke("show-main"),
   getAppInfo: () => ipcRenderer.invoke("get-app-info"),
+  speakEnglish: (text: string) => ipcRenderer.invoke("speak-english", text),
 });

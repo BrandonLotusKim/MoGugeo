@@ -3,7 +3,7 @@ import { execFile } from "node:child_process";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { buildDailyPopupTaskXml, parseTaskTime } from "./taskXml";
+import { buildDailyPopupTaskXml, decodeConsoleOutput, parseTaskTime } from "./taskXml";
 
 const TASK_NAME = "MoGugeo Daily Popup";
 const TIME_PATTERN = /^([01]\d|2[0-3]):([0-5]\d)$/;
@@ -22,14 +22,24 @@ export type ApplyResult = {
 
 function runSchtasks(args: string[]): Promise<string> {
   return new Promise((resolve, reject) => {
-    execFile("schtasks", args, { windowsHide: true }, (error, stdout, stderr) => {
+    // 한국어 Windows 의 schtasks 는 CP949 로 출력하므로 바이트로 받아 직접 디코딩한다.
+    execFile("schtasks", args, { windowsHide: true, encoding: "buffer" }, (error, stdout, stderr) => {
       if (error) {
-        reject(new Error(stderr || error.message));
+        reject(new Error(decodeConsoleOutput(stderr).trim() || error.message));
         return;
       }
-      resolve(stdout);
+      resolve(decodeConsoleOutput(stdout));
     });
   });
+}
+
+async function taskExists(): Promise<boolean> {
+  try {
+    await runSchtasks(["/query", "/tn", TASK_NAME]);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 async function createTaskFromXml(time: string): Promise<void> {
@@ -65,14 +75,14 @@ export async function setDailyPopupTask(enabled: boolean, time: string): Promise
   }
 
   if (!enabled) {
+    // 작업이 원래 없으면 지울 것도 없다. (오류 문구는 OS 언어마다 달라 문구로 판별하지 않는다)
+    if (!(await taskExists())) {
+      return { applied: true };
+    }
     try {
       await runSchtasks(["/delete", "/tn", TASK_NAME, "/f"]);
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      // 작업이 원래 없으면 성공으로 본다.
-      if (!/cannot find|찾을 수 없/i.test(message)) {
-        return { applied: false, reason: message };
-      }
+      return { applied: false, reason: error instanceof Error ? error.message : String(error) };
     }
     return { applied: true };
   }

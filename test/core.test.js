@@ -239,3 +239,33 @@ test("한→영 채점: 대소문자·문장부호 무시, 반복·무관 답은
   assert.ok(Core.scoreEnglishSentence(repeated, s001) < Core.PASS_SCORE);
   assert.equal(Core.scoreEnglishSentence("", s001), 0);
 });
+
+test("영→한 채점: 핵심어만 나열한 답은 50문장 모두 불합격", () => {
+  sentences.forEach((sentence) => {
+    const listed = sentence.keywords.join(" ");
+    assert.ok(Core.scoreKoreanTranslation(listed, sentence) < Core.PASS_SCORE, `${sentence.id}: "${listed}"`);
+  });
+});
+
+test("영→한 채점: 조사를 모두 뗀 전보식 답은 감점, 조사를 바꿔 쓴 자연스러운 답은 통과", () => {
+  assert.ok(Core.scoreKoreanTranslation("오늘 아침 휴대전화 부엌 식탁 위 두고 왔어요", s001) < Core.PASS_SCORE);
+  assert.ok(Core.scoreKoreanTranslation("오늘 아침 핸드폰을 부엌 식탁에 두고 왔어", s001) >= Core.PASS_SCORE);
+  assert.ok(Core.scoreKoreanTranslation("나는 오늘 아침 휴대폰을 부엌 테이블에 두고 나왔다", s001) >= Core.PASS_SCORE);
+  // "결과", "이의" 처럼 조사처럼 끝나는 낱말을 조사로 착각하지 않는다.
+  const s027 = sentences.find((sentence) => sentence.id === "s027");
+  assert.ok(Core.scoreKoreanTranslation("그 연구 결과 오랫동안 의심받지 않았던 가정들 이의 제기", s027) < Core.PASS_SCORE);
+});
+
+test("한→영 채점: 관사·전치사·대명사를 모두 뺀 내용어 나열은 불합격", () => {
+  assert.ok(Core.scoreEnglishSentence("left phone kitchen table this morning", s001) < Core.PASS_SCORE);
+  assert.ok(Core.scoreEnglishSentence("This morning I left my phone on the kitchen table.", s001) >= Core.PASS_SCORE);
+});
+
+test("감점 이유 문구: 핵심어 나열·조사 누락·관사 누락일 때만 나온다", () => {
+  assert.match(Core.getKoreanFormHint(s001.keywords.join(" "), s001), /핵심어만 나열/);
+  assert.match(Core.getKoreanFormHint("오늘 아침 휴대전화 부엌 식탁 위 두고 왔어요", s001), /조사/);
+  assert.equal(Core.getKoreanFormHint(s001.answer, s001), "");
+  assert.match(Core.getEnglishFormHint("left phone kitchen table this morning", s001), /관사/);
+  assert.equal(Core.getEnglishFormHint(s001.english, s001), "");
+  assert.equal(Core.getKoreanFormHint("", s001), "");
+});
