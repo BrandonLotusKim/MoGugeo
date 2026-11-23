@@ -17,4 +17,5 @@ contextBridge.exposeInMainWorld("mogugeo", {
   showMain: () => ipcRenderer.invoke("show-main"),
   getAppInfo: () => ipcRenderer.invoke("get-app-info"),
   speakEnglish: (text: string) => ipcRenderer.invoke("speak-english", text),
+  aiScore: (payload: unknown) => ipcRenderer.invoke("ai-score", payload),
 });

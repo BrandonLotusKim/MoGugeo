@@ -2,6 +2,7 @@ import { app, BrowserWindow, Tray, Menu, ipcMain, nativeImage, powerMonitor, she
 import path from "node:path";
 import { getDailyPopupTask, setDailyPopupTask } from "./scheduler";
 import { speakEnglish } from "./speech";
+import { scoreWithGemini } from "./aiScore";
 
 let mainWindow: BrowserWindow | null = null;
 let popupWindow: BrowserWindow | null = null;
@@ -201,6 +202,7 @@ ipcMain.handle("get-app-info", () => {
 
 // IPC 핸들러: 브라우저에 영어 음성이 없을 때 Windows 음성으로 읽기
 ipcMain.handle("speak-english", (_event, text: unknown) => speakEnglish(text));
+ipcMain.handle("ai-score", (_event, payload: unknown) => scoreWithGemini(payload));
 
 // IPC 핸들러: 렌더러에서 팝업 열기 요청
 ipcMain.handle("open-popup", () => {

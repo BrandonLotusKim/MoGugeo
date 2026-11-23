@@ -724,7 +724,7 @@ function initSentence() {
     return;
   }
 
-  checkBtn.addEventListener("click", () => {
+  checkBtn.addEventListener("click", async () => {
     if (answered || !current) return;
     const answer = textarea.value.trim();
     if (!answer) {
@@ -733,7 +733,14 @@ function initSentence() {
       return;
     }
     answered = true;
-    const score = Core.scoreKoreanTranslation(answer, current);
+    textarea.disabled = true;
+    checkBtn.disabled = true;
+    const checkLabel = checkBtn.textContent;
+    const ai = await tryAiScore(() => {
+      checkBtn.textContent = "AI 채점 중...";
+    }, "en-to-ko", current.english, current.answer, answer);
+    checkBtn.textContent = checkLabel;
+    const score = ai ? ai.score : Core.scoreKoreanTranslation(answer, current);
     const update = updateState((latest) => Core.submitAnswer(latest, {
       contentId: Core.getSentenceId(current),
       direction: "en-to-ko",
@@ -744,9 +751,7 @@ function initSentence() {
     state = update.state;
     const result = update.result;
     answeredThisSession.add(Core.getSentenceId(current));
-    textarea.disabled = true;
-    checkBtn.disabled = true;
-    renderFeedback(current, answer, result);
+    renderFeedback(current, answer, result, ai);
     renderProgress();
     syncReviewButton();
     nextBtn.focus();
@@ -788,21 +793,42 @@ function initSentence() {
   load();
 }
 
-function renderFeedback(sentence, userAnswer, result) {
+/**
+ * 설정에 Gemini API 키가 있으면 AI 로 채점한다. 키가 없거나 실패하면 null(규칙 채점으로 대체).
+ * onStart 는 실제로 AI 를 부를 때만 호출된다(버튼 문구 등).
+ */
+async function tryAiScore(onStart, direction, source, reference, answer) {
+  // 설정의 키가 비어 있어도 메인 프로세스가 이 PC의 GEMINI_API_KEY 를 찾아 본다.
+  const apiKey = getState().settings.geminiApiKey;
+  if (!window.mogugeo?.aiScore) return null;
+  onStart?.();
+  try {
+    const result = await window.mogugeo.aiScore({ apiKey, direction, source, reference, answer });
+    if (result && result.ok) return result;
+    console.warn("AI 채점 실패, 규칙 채점으로 대체:", result?.reason);
+  } catch (error) {
+    console.warn("AI 채점 실패, 규칙 채점으로 대체:", error);
+  }
+  return null;
+}
+
+function renderFeedback(sentence, userAnswer, result, ai = null) {
   const feedback = $("#feedback-section");
   feedback.hidden = false;
 
   const banner = $("#sentence-result");
-  const hint = Core.getKoreanFormHint(userAnswer, sentence);
+  const hint = ai ? "" : Core.getKoreanFormHint(userAnswer, sentence);
   banner.className = `result-banner ${result.isCorrect ? "pass" : "fail"}`;
   banner.replaceChildren(
     icon(result.isCorrect ? "check_circle" : "cancel"),
     el("div", {}, [
+      ai ? el("span", { className: "ai-badge", text: "✦ AI 채점 결과 · Gemini" }) : null,
       el("strong", { className: "result-title", text: result.isCorrect ? "정답입니다" : "다시 볼 문장입니다" }),
-      el("p", { className: "result-copy", text: getReviewMessage(result, sentence) }),
+      ai && ai.comment ? el("p", { className: "result-copy", text: ai.comment }) : null,
+      el("p", { className: "result-copy", text: ai ? getReviewMessage(result, sentence).replace("점 이상", "% 이상") : getReviewMessage(result, sentence) }),
       hint ? el("p", { className: "result-copy result-hint", text: hint }) : null,
     ]),
-    el("span", { className: "result-score", text: `${result.score}점` }),
+    el("span", { className: "result-score", text: ai ? `${result.score}%` : `${result.score}점` }),
   );
 
   $("#feedback-user-answer").textContent = userAnswer;
@@ -1174,6 +1200,20 @@ async function initSettings() {
     clearFieldError(nicknameInput);
     const status = $("#settings-nickname-status");
     if (status) status.textContent = "";
+  });
+
+  const geminiKeyInput = $("#settings-gemini-key");
+  if (geminiKeyInput) geminiKeyInput.value = state.settings.geminiApiKey || "";
+  $("#settings-gemini-key-save")?.addEventListener("click", () => {
+    commit((draft) => {
+      draft.settings.geminiApiKey = geminiKeyInput.value.trim();
+    });
+    const status = $("#settings-gemini-key-status");
+    if (status) {
+      status.textContent = state.settings.geminiApiKey
+        ? "저장했습니다. 문장 해석을 AI로 채점합니다."
+        : "키를 지웠습니다. 이 PC의 GEMINI_API_KEY가 있으면 그 키로, 없으면 규칙 채점으로 채점합니다.";
+    }
   });
 
   $("#btn-open-popup")?.addEventListener("click", () => {

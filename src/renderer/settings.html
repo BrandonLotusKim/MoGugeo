@@ -102,6 +102,12 @@
                   <button class="btn btn-ghost" id="settings-nickname-save" type="button">저장</button>
                 </div>
                 <p class="field-help" id="settings-nickname-status" role="status"></p>
+                <label for="settings-gemini-key" class="spacer-top">AI 채점 (Gemini API 키)</label>
+                <div class="inline-field">
+                  <input class="text-input" id="settings-gemini-key" type="password" maxlength="200" autocomplete="off" placeholder="비워 두면 이 PC의 GEMINI_API_KEY 사용">
+                  <button class="btn btn-ghost" id="settings-gemini-key-save" type="button">저장</button>
+                </div>
+                <p class="field-help" id="settings-gemini-key-status" role="status">Google AI Studio에서 무료 키를 받을 수 있습니다. 키는 이 PC에만 저장되고, 키가 없거나 호출에 실패하면 규칙 채점으로 채점합니다.</p>
               </div>
               <div>
                 <p class="fine-copy">프로필과 학습 기록은 이 PC에만 저장됩니다. 계정 서버와 기기 간 동기화는 다음 버전에서 제공할 예정입니다.</p>

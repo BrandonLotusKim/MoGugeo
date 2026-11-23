@@ -85,6 +85,7 @@
       autoLogin: true,
       difficulty: DEFAULT_DIFFICULTY,
       learningType: "sentence",
+      geminiApiKey: "",
     };
   }
 
@@ -121,6 +122,8 @@
       difficulty: normalizeDifficulty(source.difficulty, defaults.difficulty),
       // 현재 제공하는 학습 유형은 문장 해석 하나뿐이다.
       learningType: "sentence",
+      // 비어 있으면 AI 채점을 쓰지 않고 규칙 채점만 한다.
+      geminiApiKey: typeof source.geminiApiKey === "string" ? source.geminiApiKey.trim().slice(0, 200) : "",
     };
   }
 

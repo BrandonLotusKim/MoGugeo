@@ -2393,6 +2393,19 @@ body.dark .result-banner.fail {
   line-height: 1.5;
 }
 
+.ai-badge {
+  display: block;
+  width: fit-content;
+  margin-bottom: 4px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #4f46e5, #0b6b52);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
 .result-score {
   font-family: "Manrope", "Malgun Gothic", sans-serif;
   font-size: 32px;
