@@ -1,6 +1,10 @@
 # 모국어 (MoGugeo)
 
-> 매일 아침 5분, 데스크톱에서 영어 학습 루틴을 만드는 Windows Electron 앱.
+[![CI](https://github.com/BrandonLotusKim/MoGugeo/actions/workflows/ci.yml/badge.svg)](https://github.com/BrandonLotusKim/MoGugeo/actions/workflows/ci.yml)
+
+> 영어 앱을 열 필요가 없습니다. 영어가 먼저 찾아옵니다. 출근 전 5분, 두 문장이면 오늘 공부 끝.
+
+소개 페이지: https://brndnkm-mogugeo.pages.dev
 
 | 대시보드 | 데일리 팝업 |
 |---|---|
@@ -92,6 +96,10 @@ MoGugeo/
 ## 인프라
 
 전부 무료 티어로 구성 (Supabase + GitHub). 유료 전환 계획 없음.
+
+## 개발 이력
+
+2026년 3월부터 비공개 저장소에서 개발했고, 공개하면서 이력을 정리해 새로 올렸습니다. 이 저장소의 커밋 날짜는 공개한 시점(2026년 11월)부터이며, 버전별 변경은 `CHANGELOG.md`에 있습니다.
 
 ## 라이선스
 
